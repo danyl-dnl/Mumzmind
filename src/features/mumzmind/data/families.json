@@ -1,0 +1,334 @@
+[
+  {
+    "id": "fam-sara-omar",
+    "parentName": "Sara",
+    "babyName": "Omar",
+    "predictedAgeMonths": 5,
+    "confidence": 87,
+    "currentStage": "Diaper Size 3",
+    "nextStage": "Starting Solids",
+    "nextStageWindow": "2-4 weeks",
+    "purchaseHistory": [
+      {
+        "productName": "Newborn Diapers Jumbo Pack",
+        "category": "newborn diapers",
+        "date": "2025-11-03",
+        "quantity": 2,
+        "price": 89
+      },
+      {
+        "productName": "Sensitive Baby Wipes 6-Pack",
+        "category": "wipes",
+        "date": "2025-11-04",
+        "quantity": 1,
+        "price": 34
+      },
+      {
+        "productName": "Anti-Colic Feeding Bottle Set",
+        "category": "feeding bottle",
+        "date": "2025-11-08",
+        "quantity": 1,
+        "price": 74
+      },
+      {
+        "productName": "Size 1 Diapers Value Box",
+        "category": "size 1 diapers",
+        "date": "2025-12-01",
+        "quantity": 2,
+        "price": 96
+      },
+      {
+        "productName": "Orthodontic Pacifier Twin Pack",
+        "category": "pacifier",
+        "date": "2025-12-05",
+        "quantity": 1,
+        "price": 22
+      },
+      {
+        "productName": "Size 2 Diapers Mega Box",
+        "category": "size 2 diapers",
+        "date": "2026-01-12",
+        "quantity": 2,
+        "price": 102
+      },
+      {
+        "productName": "Size 3 Diapers Monthly Box",
+        "category": "size 3 diapers",
+        "date": "2026-03-02",
+        "quantity": 1,
+        "price": 118
+      },
+      {
+        "productName": "Sensitive Baby Wipes 12-Pack",
+        "category": "wipes",
+        "date": "2026-03-15",
+        "quantity": 1,
+        "price": 58
+      }
+    ],
+    "riskLevel": "Low",
+    "daysSilent": 8,
+    "preferredLanguage": "English",
+    "country": "UAE"
+  },
+  {
+    "id": "fam-aisha-layla",
+    "parentName": "Aisha",
+    "babyName": "Layla",
+    "predictedAgeMonths": 7,
+    "confidence": 91,
+    "currentStage": "Starting Solids",
+    "nextStage": "Sitting Support",
+    "nextStageWindow": "3-5 weeks",
+    "purchaseHistory": [
+      {
+        "productName": "Newborn Diapers Starter Pack",
+        "category": "newborn diapers",
+        "date": "2025-09-14",
+        "quantity": 2,
+        "price": 84
+      },
+      {
+        "productName": "Size 1 Diapers Value Box",
+        "category": "size 1 diapers",
+        "date": "2025-10-02",
+        "quantity": 2,
+        "price": 96
+      },
+      {
+        "productName": "Premium Baby Wipes 8-Pack",
+        "category": "wipes",
+        "date": "2025-10-03",
+        "quantity": 1,
+        "price": 42
+      },
+      {
+        "productName": "Glass Feeding Bottle Trio",
+        "category": "feeding bottle",
+        "date": "2025-10-10",
+        "quantity": 1,
+        "price": 88
+      },
+      {
+        "productName": "Size 2 Diapers Mega Box",
+        "category": "size 2 diapers",
+        "date": "2025-11-21",
+        "quantity": 2,
+        "price": 102
+      },
+      {
+        "productName": "Baby Rice Cereal Multipack",
+        "category": "baby cereal",
+        "date": "2026-02-06",
+        "quantity": 1,
+        "price": 39
+      },
+      {
+        "productName": "Waterproof Bibs 3-Pack",
+        "category": "bibs",
+        "date": "2026-02-08",
+        "quantity": 1,
+        "price": 31
+      },
+      {
+        "productName": "Adjustable High Chair",
+        "category": "high chair",
+        "date": "2026-02-19",
+        "quantity": 1,
+        "price": 349
+      }
+    ],
+    "riskLevel": "Medium",
+    "daysSilent": 13,
+    "preferredLanguage": "Arabic",
+    "country": "Saudi Arabia"
+  },
+  {
+    "id": "fam-noor-adam",
+    "parentName": "Noor",
+    "babyName": "Adam",
+    "predictedAgeMonths": 3,
+    "confidence": 84,
+    "currentStage": "Diaper Size 2",
+    "nextStage": "Diaper Size 3",
+    "nextStageWindow": "2-3 weeks",
+    "purchaseHistory": [
+      {
+        "productName": "Newborn Diapers Jumbo Pack",
+        "category": "newborn diapers",
+        "date": "2026-01-03",
+        "quantity": 2,
+        "price": 89
+      },
+      {
+        "productName": "Pure Cotton Pacifier Set",
+        "category": "pacifier",
+        "date": "2026-01-05",
+        "quantity": 1,
+        "price": 24
+      },
+      {
+        "productName": "Sensitive Baby Wipes 6-Pack",
+        "category": "wipes",
+        "date": "2026-01-06",
+        "quantity": 1,
+        "price": 34
+      },
+      {
+        "productName": "Wide Neck Feeding Bottle Duo",
+        "category": "feeding bottle",
+        "date": "2026-01-09",
+        "quantity": 1,
+        "price": 56
+      },
+      {
+        "productName": "Size 1 Diapers Value Box",
+        "category": "size 1 diapers",
+        "date": "2026-02-01",
+        "quantity": 2,
+        "price": 96
+      },
+      {
+        "productName": "Size 2 Diapers Mega Box",
+        "category": "size 2 diapers",
+        "date": "2026-03-10",
+        "quantity": 2,
+        "price": 102
+      }
+    ],
+    "riskLevel": "Low",
+    "daysSilent": 5,
+    "preferredLanguage": "English",
+    "country": "Qatar"
+  },
+  {
+    "id": "fam-mariam-zayn",
+    "parentName": "Mariam",
+    "babyName": "Zayn",
+    "predictedAgeMonths": 9,
+    "confidence": 78,
+    "currentStage": "Crawling Prep",
+    "nextStage": "First Shoes",
+    "nextStageWindow": "4-6 weeks",
+    "purchaseHistory": [
+      {
+        "productName": "Newborn Diapers Starter Pack",
+        "category": "newborn diapers",
+        "date": "2025-07-18",
+        "quantity": 2,
+        "price": 84
+      },
+      {
+        "productName": "Size 1 Diapers Value Box",
+        "category": "size 1 diapers",
+        "date": "2025-08-06",
+        "quantity": 2,
+        "price": 96
+      },
+      {
+        "productName": "Size 2 Diapers Mega Box",
+        "category": "size 2 diapers",
+        "date": "2025-09-17",
+        "quantity": 2,
+        "price": 102
+      },
+      {
+        "productName": "Size 3 Diapers Monthly Box",
+        "category": "size 3 diapers",
+        "date": "2025-11-04",
+        "quantity": 2,
+        "price": 118
+      },
+      {
+        "productName": "Baby Rice Cereal Multipack",
+        "category": "baby cereal",
+        "date": "2025-12-22",
+        "quantity": 1,
+        "price": 39
+      },
+      {
+        "productName": "Waterproof Bibs 3-Pack",
+        "category": "bibs",
+        "date": "2025-12-23",
+        "quantity": 1,
+        "price": 31
+      },
+      {
+        "productName": "Crawling Sensory Toy Set",
+        "category": "crawling toys",
+        "date": "2026-02-12",
+        "quantity": 1,
+        "price": 67
+      }
+    ],
+    "riskLevel": "High",
+    "daysSilent": 21,
+    "preferredLanguage": "Arabic",
+    "country": "Kuwait"
+  },
+  {
+    "id": "fam-fatima-hana",
+    "parentName": "Fatima",
+    "babyName": "Hana",
+    "predictedAgeMonths": 12,
+    "confidence": 82,
+    "currentStage": "First Shoes",
+    "nextStage": "Toddler Snacks",
+    "nextStageWindow": "3-4 weeks",
+    "purchaseHistory": [
+      {
+        "productName": "Newborn Diapers Jumbo Pack",
+        "category": "newborn diapers",
+        "date": "2025-04-09",
+        "quantity": 2,
+        "price": 89
+      },
+      {
+        "productName": "Size 1 Diapers Value Box",
+        "category": "size 1 diapers",
+        "date": "2025-05-01",
+        "quantity": 2,
+        "price": 96
+      },
+      {
+        "productName": "Size 2 Diapers Mega Box",
+        "category": "size 2 diapers",
+        "date": "2025-06-08",
+        "quantity": 2,
+        "price": 102
+      },
+      {
+        "productName": "Size 3 Diapers Monthly Box",
+        "category": "size 3 diapers",
+        "date": "2025-08-14",
+        "quantity": 2,
+        "price": 118
+      },
+      {
+        "productName": "Baby Rice Cereal Multipack",
+        "category": "baby cereal",
+        "date": "2025-09-20",
+        "quantity": 1,
+        "price": 39
+      },
+      {
+        "productName": "Crawling Sensory Toy Set",
+        "category": "crawling toys",
+        "date": "2025-10-28",
+        "quantity": 1,
+        "price": 67
+      },
+      {
+        "productName": "Soft Sole Baby Shoes",
+        "category": "baby shoes",
+        "date": "2026-02-03",
+        "quantity": 1,
+        "price": 79
+      }
+    ],
+    "riskLevel": "Medium",
+    "daysSilent": 16,
+    "preferredLanguage": "English",
+    "country": "Bahrain"
+  }
+]

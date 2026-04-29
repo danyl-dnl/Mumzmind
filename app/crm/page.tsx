@@ -1,15 +1,15 @@
 "use client";
 
-import HeroLanding from "@/src/features/mumzmind/components/HeroLanding";
+import CRMDashboard from "@/src/features/mumzmind/components/CRMDashboard";
 import MumzMindRouteFrame from "@/src/features/mumzmind/components/MumzMindRouteFrame";
 import { useMumzMindNavigate } from "@/src/features/mumzmind/useMumzMindNavigate";
 
-export default function Home() {
+export default function CrmPage() {
   const onNavigate = useMumzMindNavigate();
 
   return (
     <MumzMindRouteFrame>
-      <HeroLanding onNavigate={onNavigate} />
+      <CRMDashboard onNavigate={onNavigate} />
     </MumzMindRouteFrame>
   );
 }

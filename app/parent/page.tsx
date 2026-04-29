@@ -1,15 +1,15 @@
 "use client";
 
-import HeroLanding from "@/src/features/mumzmind/components/HeroLanding";
+import ParentApp from "@/src/features/mumzmind/components/ParentApp";
 import MumzMindRouteFrame from "@/src/features/mumzmind/components/MumzMindRouteFrame";
 import { useMumzMindNavigate } from "@/src/features/mumzmind/useMumzMindNavigate";
 
-export default function Home() {
+export default function ParentPage() {
   const onNavigate = useMumzMindNavigate();
 
   return (
     <MumzMindRouteFrame>
-      <HeroLanding onNavigate={onNavigate} />
+      <ParentApp onNavigate={onNavigate} />
     </MumzMindRouteFrame>
   );
 }

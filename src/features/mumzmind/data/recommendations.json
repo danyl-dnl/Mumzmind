@@ -1,0 +1,52 @@
+[
+  {
+    "stage": "Newborn Care",
+    "recommendedCategories": ["newborn diapers", "wipes", "feeding bottle", "pacifier"],
+    "message": "You are in the earliest days of care. Soft, reliable basics can help every routine feel a little lighter."
+  },
+  {
+    "stage": "Diaper Size 1",
+    "recommendedCategories": ["size 1 diapers", "wipes", "feeding bottle"],
+    "message": "A new fit often means a new rhythm. Keeping daily essentials close can make the transition feel effortless."
+  },
+  {
+    "stage": "Diaper Size 2",
+    "recommendedCategories": ["size 2 diapers", "wipes", "pacifier"],
+    "message": "This stage often brings steadier routines. A simple restock of trusted basics can go a long way."
+  },
+  {
+    "stage": "Diaper Size 3",
+    "recommendedCategories": ["size 3 diapers", "wipes", "feeding bottle"],
+    "message": "Your baby may be growing quickly now. A thoughtful top-up can help you stay prepared for the next few weeks."
+  },
+  {
+    "stage": "Feeding Routine",
+    "recommendedCategories": ["feeding bottle", "pacifier", "wipes"],
+    "message": "Feeding routines are becoming more defined. Helpful replacements and little upgrades can make everyday moments easier."
+  },
+  {
+    "stage": "Starting Solids",
+    "recommendedCategories": ["baby cereal", "bibs", "high chair"],
+    "message": "This next chapter may be approaching soon. Gentle mealtime essentials can help you prepare with confidence and calm."
+  },
+  {
+    "stage": "Sitting Support",
+    "recommendedCategories": ["high chair", "bibs", "crawling toys"],
+    "message": "Your baby may be getting stronger and more curious. Supportive items can make play and mealtimes more comfortable."
+  },
+  {
+    "stage": "Crawling Prep",
+    "recommendedCategories": ["crawling toys", "wipes", "baby shoes"],
+    "message": "Movement may be just around the corner. A few safe, engaging picks can help your baby explore with joy."
+  },
+  {
+    "stage": "First Shoes",
+    "recommendedCategories": ["baby shoes", "crawling toys"],
+    "message": "Early steps can feel like a big moment. Soft, flexible footwear can support this stage in a gentle way."
+  },
+  {
+    "stage": "Toddler Snacks",
+    "recommendedCategories": ["baby cereal", "bibs", "wipes"],
+    "message": "Mealtimes may be getting more independent now. Familiar staples can help keep the day feeling simple and steady."
+  }
+]

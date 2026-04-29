@@ -1,0 +1,92 @@
+[
+  {
+    "id": "newborn-care",
+    "name": "Newborn Care",
+    "ageRangeMonths": "0-1",
+    "recommendedCategories": ["newborn diapers", "wipes", "feeding bottle", "pacifier"],
+    "signals": ["Frequent newborn diaper reorders", "Bottle starter kits purchased", "High wipes usage in first 30 days"],
+    "nextLikelyStages": ["Diaper Size 1"],
+    "parentMessage": "You are settling into the earliest routines. Gentle essentials can make everyday care feel more manageable."
+  },
+  {
+    "id": "diaper-size-1",
+    "name": "Diaper Size 1",
+    "ageRangeMonths": "1-2",
+    "recommendedCategories": ["size 1 diapers", "wipes", "feeding bottle", "pacifier"],
+    "signals": ["Newborn diaper purchases slow down", "Size 1 diaper box added to cart", "Steady repeat orders for wipes"],
+    "nextLikelyStages": ["Diaper Size 2", "Feeding Routine"],
+    "parentMessage": "Your baby may be moving into a new fit and feeding rhythm. A small stock-up now can keep things calm."
+  },
+  {
+    "id": "diaper-size-2",
+    "name": "Diaper Size 2",
+    "ageRangeMonths": "2-4",
+    "recommendedCategories": ["size 2 diapers", "wipes", "feeding bottle", "pacifier"],
+    "signals": ["Size 2 diaper purchases begin", "Size 1 reorders taper off", "Bottle quantities remain stable"],
+    "nextLikelyStages": ["Diaper Size 3", "Feeding Routine"],
+    "parentMessage": "This stage often brings a little more predictability. Replenishing the basics helps you stay one step ahead."
+  },
+  {
+    "id": "diaper-size-3",
+    "name": "Diaper Size 3",
+    "ageRangeMonths": "4-6",
+    "recommendedCategories": ["size 3 diapers", "wipes", "feeding bottle"],
+    "signals": ["Size 3 diaper packs purchased", "Wipes reorder volume increases", "Feeding frequency patterns become clearer"],
+    "nextLikelyStages": ["Starting Solids", "Feeding Routine"],
+    "parentMessage": "Many families reach an important transition here. It can be a good moment to start preparing for what may come next."
+  },
+  {
+    "id": "feeding-routine",
+    "name": "Feeding Routine",
+    "ageRangeMonths": "4-6",
+    "recommendedCategories": ["feeding bottle", "pacifier", "wipes"],
+    "signals": ["Bottle replacement purchases", "Formula or feeding accessory growth", "Regular bottle reorder cadence"],
+    "nextLikelyStages": ["Starting Solids"],
+    "parentMessage": "Feeding habits are becoming more established. A few thoughtful upgrades can make daily routines easier."
+  },
+  {
+    "id": "starting-solids",
+    "name": "Starting Solids",
+    "ageRangeMonths": "5-7",
+    "recommendedCategories": ["baby cereal", "bibs", "high chair"],
+    "signals": ["Size 3 diaper purchases continue", "Baby cereal viewed or purchased", "Parents browse feeding accessories"],
+    "nextLikelyStages": ["Sitting Support", "Crawling Prep"],
+    "parentMessage": "This next chapter can feel exciting and tender. A few supportive essentials can help the transition feel smooth."
+  },
+  {
+    "id": "sitting-support",
+    "name": "Sitting Support",
+    "ageRangeMonths": "6-8",
+    "recommendedCategories": ["high chair", "bibs", "crawling toys"],
+    "signals": ["High chair added to order history", "Feeding accessories rise", "Floor play products start appearing"],
+    "nextLikelyStages": ["Crawling Prep"],
+    "parentMessage": "Your baby may be getting steadier and more curious. Comfort and support items can encourage the next steps."
+  },
+  {
+    "id": "crawling-prep",
+    "name": "Crawling Prep",
+    "ageRangeMonths": "8-10",
+    "recommendedCategories": ["crawling toys", "wipes", "baby shoes"],
+    "signals": ["Floor activity toys purchased", "Interest in movement toys increases", "Parents start browsing first footwear"],
+    "nextLikelyStages": ["First Shoes"],
+    "parentMessage": "Movement is often just around the corner here. Safe, engaging play essentials can make this stage feel joyful."
+  },
+  {
+    "id": "first-shoes",
+    "name": "First Shoes",
+    "ageRangeMonths": "10-13",
+    "recommendedCategories": ["baby shoes", "crawling toys"],
+    "signals": ["Baby shoes viewed or purchased", "Mobility products increase", "Floor play remains active"],
+    "nextLikelyStages": ["Toddler Snacks"],
+    "parentMessage": "Early steps bring big feelings. Soft, supportive essentials can help families feel ready without rushing."
+  },
+  {
+    "id": "toddler-snacks",
+    "name": "Toddler Snacks",
+    "ageRangeMonths": "12-18",
+    "recommendedCategories": ["baby cereal", "bibs", "wipes"],
+    "signals": ["Snack-related shopping rises", "Self-feeding tools appear", "Parents continue replenishing mealtime basics"],
+    "nextLikelyStages": [],
+    "parentMessage": "Your little one may be exploring more independence at mealtime. Familiar, practical staples can keep things simple."
+  }
+]

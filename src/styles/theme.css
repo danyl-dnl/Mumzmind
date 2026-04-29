@@ -1,0 +1,331 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+
+  /* MumzMind Premium Raspberry Palette */
+  --warm-ivory: #fff8f5;
+  --blush-pink: #f4b2b0;
+  --pale-peach: #fdf1f0;
+  --mist-lavender: #fae1e2;
+  --dusty-rose: #d96f78;
+  --warm-sand: #fff1ef;
+  --soft-mint: #f8d4d3;
+  --powder-blue: #f3c9cd;
+  --deep-plum: #250000;
+  --soft-espresso: #4a1018;
+  --muted-mauve: #8a4d57;
+  --coral: #a50d25;
+  --rose: #de3a57;
+  --soft-teal: #d96f78;
+  --primary-hover: #c92f4b;
+  --deep-berry: #a50d25;
+  --dark-chocolate: #250000;
+
+  /* Gradients */
+  --gradient-warm: linear-gradient(135deg, #f4b2b0 0%, #de3a57 48%, #a50d25 100%);
+  --gradient-sunset: linear-gradient(135deg, #d96f78 0%, #de3a57 42%, #a50d25 78%, #250000 100%);
+  --gradient-calm: radial-gradient(circle at top left, rgba(244, 178, 176, 0.34), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(222, 58, 87, 0.16), transparent 32%),
+    linear-gradient(135deg, #fff8f5 0%, #fdf1f0 48%, #fae1e2 100%);
+  --gradient-mesh: radial-gradient(circle at top left, rgba(255, 255, 255, 0.28), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(37, 0, 0, 0.12), transparent 34%),
+    linear-gradient(135deg, #f4b2b0 0%, #de3a57 48%, #a50d25 100%);
+
+  /* Theme tokens */
+  --background: var(--warm-ivory);
+  --foreground: var(--deep-plum);
+  --card: #ffffff;
+  --card-foreground: var(--deep-plum);
+  --popover: #ffffff;
+  --popover-foreground: var(--deep-plum);
+  --primary: var(--rose);
+  --primary-foreground: #ffffff;
+  --secondary: var(--pale-peach);
+  --secondary-foreground: var(--deep-plum);
+  --muted: var(--mist-lavender);
+  --muted-foreground: var(--muted-mauve);
+  --accent: var(--dusty-rose);
+  --accent-foreground: #ffffff;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: rgba(37, 0, 0, 0.08);
+  --input: transparent;
+  --input-background: rgba(255, 255, 255, 0.72);
+  --switch-background: var(--muted-mauve);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: var(--rose);
+  --chart-1: var(--coral);
+  --chart-2: var(--soft-teal);
+  --chart-3: var(--rose);
+  --chart-4: #f4b2b0;
+  --chart-5: #fae1e2;
+  --radius: 1.5rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: var(--deep-plum);
+  --sidebar-primary: var(--rose);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--mist-lavender);
+  --sidebar-accent-foreground: var(--deep-plum);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--rose);
+}
+
+.dark {
+  --background: #1a0608;
+  --foreground: #fff4f2;
+  --card: #250000;
+  --card-foreground: #fff4f2;
+  --popover: #250000;
+  --popover-foreground: #fff4f2;
+  --primary: #f4b2b0;
+  --primary-foreground: #250000;
+  --secondary: #54131d;
+  --secondary-foreground: #fff4f2;
+  --muted: #3f0c14;
+  --muted-foreground: #e8b8bc;
+  --accent: #6c1d2b;
+  --accent-foreground: #fff4f2;
+  --destructive: #f1637a;
+  --destructive-foreground: #250000;
+  --border: rgba(255, 244, 242, 0.12);
+  --input: rgba(255, 244, 242, 0.12);
+  --ring: #de3a57;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: #de3a57;
+  --chart-2: #d96f78;
+  --chart-3: #f4b2b0;
+  --chart-4: #a50d25;
+  --chart-5: #fae1e2;
+  --sidebar: #250000;
+  --sidebar-foreground: #fff4f2;
+  --sidebar-primary: #de3a57;
+  --sidebar-primary-foreground: #fff4f2;
+  --sidebar-accent: #54131d;
+  --sidebar-accent-foreground: #fff4f2;
+  --sidebar-border: rgba(255, 244, 242, 0.12);
+  --sidebar-ring: #de3a57;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    overflow-x: clip;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+  }
+
+  /**
+  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
+  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
+  */
+
+  html {
+    font-size: var(--font-size);
+    overflow-x: clip;
+  }
+
+  html:focus-within {
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    background: rgba(222, 58, 87, 0.18);
+    color: var(--deep-plum);
+  }
+
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      color 180ms ease,
+      opacity 180ms ease,
+      transform 180ms ease;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgba(255, 248, 245, 0.94),
+      0 0 0 6px rgba(222, 58, 87, 0.34);
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+}
+
+@layer components {
+  .mumz-card {
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(37, 0, 0, 0.08);
+    box-shadow:
+      0 18px 48px rgba(37, 0, 0, 0.07),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .mumz-card-soft {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(37, 0, 0, 0.08);
+    box-shadow: 0 14px 34px rgba(37, 0, 0, 0.05);
+    backdrop-filter: blur(14px);
+  }
+
+  .mumz-primary-button {
+    background: linear-gradient(135deg, #de3a57 0%, #c92f4b 45%, #a50d25 100%);
+    box-shadow: 0 18px 30px rgba(165, 13, 37, 0.22);
+  }
+
+  .mumz-primary-button:hover {
+    box-shadow: 0 22px 38px rgba(165, 13, 37, 0.28);
+  }
+
+  .mumz-secondary-button {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(37, 0, 0, 0.08);
+    box-shadow: 0 10px 24px rgba(37, 0, 0, 0.06);
+    backdrop-filter: blur(14px);
+  }
+
+  .mumz-secondary-button:hover {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 14px 28px rgba(37, 0, 0, 0.08);
+  }
+
+  .mumz-subtle-button {
+    background: rgba(244, 178, 176, 0.42);
+    border: 1px solid rgba(37, 0, 0, 0.06);
+    box-shadow: 0 8px 18px rgba(37, 0, 0, 0.04);
+  }
+
+  .mumz-badge {
+    background: rgba(244, 178, 176, 0.38);
+    border: 1px solid rgba(37, 0, 0, 0.05);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .mumz-empty-state {
+    background:
+      radial-gradient(circle at top left, rgba(255, 255, 255, 0.48), transparent 34%),
+      linear-gradient(135deg, rgba(244, 178, 176, 0.18) 0%, rgba(250, 225, 226, 0.5) 100%);
+    border: 1px dashed rgba(37, 0, 0, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
