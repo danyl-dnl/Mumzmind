@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 import GrainTexture from "./GrainTexture";
 import MumzMindNav from "./MumzMindNav";
+import AITransparencyPanel from "./AITransparencyPanel";
 import { usePageMotion } from "../hooks/usePageMotion";
 
 export default function MumzMindRouteFrame({
@@ -36,6 +37,7 @@ export default function MumzMindRouteFrame({
       >
         {children}
       </motion.main>
+      <AITransparencyPanel />
     </div>
   );
 }

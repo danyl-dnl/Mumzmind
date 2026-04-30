@@ -16,7 +16,7 @@ const STORE_ITEMS = [
   { id: 7, name: "Luxury Play Mat", price: 45.00, iconName: "playmat" as PremiumBabyIconName, desc: "Non-toxic, soft tummy time surface" },
   { id: 8, name: "Anti-Colic Bottle Set", price: 34.00, iconName: "bottle" as PremiumBabyIconName, desc: "Natural flow for easy transition" },
   { id: 9, name: "First Walker Shoes", price: 29.99, iconName: "shoe" as PremiumBabyIconName, desc: "Flexible support for first steps" },
-  { id: 10, name: "No-Spill Sippy Cup", price: 11.50, iconName: "cup" as PremiumBabyIconName, desc: "Perfect for independent drinking" },
+  { id: 10, name: "No-Spill Sippy Cup", price: 11.50, iconName: "cup" as PremiumBabyIconName, image: "/sippy-cup.jpg", desc: "Perfect for independent drinking" },
 ];
 
 const MILESTONES = [
@@ -32,7 +32,7 @@ const STAGE_KITS: Record<string, {
   tagline: string;
   bundlePrice: string;
   saving: string;
-  products: { icon: PremiumBabyIconName; name: string; desc: string }[];
+  products: { icon: PremiumBabyIconName; name: string; desc: string; image?: string }[];
 }> = {
   "Newborn Care": {
     tagline: "Everything your newborn needs from day one.",
@@ -85,7 +85,7 @@ const STAGE_KITS: Record<string, {
     saving: "Save 10% with this bundle",
     products: [
       { icon: "shoe", name: "First Walker Shoes", desc: "Flexible support for tiny feet" },
-      { icon: "cup", name: "No-Spill Sippy Cup", desc: "Perfect for on-the-go toddlers" },
+      { icon: "cup", name: "No-Spill Sippy Cup", image: "/sippy-cup.jpg", desc: "Perfect for on-the-go toddlers" },
     ],
   },
 };
@@ -249,7 +249,15 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                     transition={{ delay: idx * 0.05 }}
                   >
                     <div className="relative aspect-square w-full overflow-hidden rounded-[1.5rem] bg-[rgba(255,251,247,0.94)] mb-4">
-                      <PremiumBabyIcon name={item.iconName} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      {item.image ? (
+                        <img 
+                          src={item.image} 
+                          alt={item.name} 
+                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        />
+                      ) : (
+                        <PremiumBabyIcon name={item.iconName} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      )}
                     </div>
                     <div className="flex flex-1 flex-col">
                       <h3 className="text-base font-medium text-[var(--deep-plum)] line-clamp-1">{item.name}</h3>
@@ -673,7 +681,11 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                             className="flex items-center gap-4 p-4 rounded-[1.5rem] bg-white border border-[rgba(42,18,18,0.03)] shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
                           >
                             <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-[1rem] bg-[rgba(255,251,247,0.94)]">
-                              <PremiumBabyIcon name={product.icon} className="h-full w-full object-cover" />
+                              {product.image ? (
+                                <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+                              ) : (
+                                <PremiumBabyIcon name={product.icon} className="h-full w-full object-cover" />
+                              )}
                             </div>
                             <div>
                               <p className="text-sm font-semibold text-[var(--deep-plum)]">{product.name}</p>
