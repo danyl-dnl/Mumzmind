@@ -1,113 +1,42 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowLeft, Star, Heart, TrendingUp, ShoppingCart, MessageCircle, Globe, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  Edit3,
+  Sparkles,
+} from "lucide-react";
+import { useRef, useState } from "react";
 
 import familiesData from "../data/families.json";
 import recommendationsData from "../data/recommendations.json";
-import { PremiumBabyIcon, type PremiumBabyIconName } from "./PremiumBabyIcons";
 import { usePageMotion } from "../hooks/usePageMotion";
 import { generateJourneyCard } from "../lib/journey-templates";
 import { predictBabyStage } from "../lib/stage-engine";
 import type { FamilyProfile, StageRecommendation } from "../types";
+import { PremiumBabyIcon, type PremiumBabyIconName } from "./PremiumBabyIcons";
 
-type EssentialCard = {
+type PreparationCard = {
   name: string;
+  note: string;
   iconName: PremiumBabyIconName;
-  color: string;
 };
 
-type ProductCard = {
-  name: string;
-  rating: number;
-  reviews: number;
-  price: string;
+type CuratedPick = {
+  title: string;
   reason: string;
   iconName: PremiumBabyIconName;
 };
 
-const CATEGORY_VISUALS: Record<string, { icon: string; color: string; productName: string; price: string }> = {
-  "Baby cereal": {
-    icon: "🥣",
-    color: "var(--soft-mint)",
-    productName: "Organic Baby Rice Cereal",
-    price: "AED 42",
-  },
-  "Soft spoons": {
-    icon: "🥄",
-    color: "var(--pale-peach)",
-    productName: "Soft Silicone Feeding Spoons",
-    price: "AED 28",
-  },
-  Bibs: {
-    icon: "👕",
-    color: "var(--blush-pink)",
-    productName: "Waterproof Feeding Bibs",
-    price: "AED 35",
-  },
-  "High chair": {
-    icon: "🪑",
-    color: "var(--mist-lavender)",
-    productName: "Adjustable High Chair",
-    price: "AED 385",
-  },
-  "Sippy cup": {
-    icon: "🍼",
-    color: "var(--powder-blue)",
-    productName: "First Sips Training Cup",
-    price: "AED 32",
-  },
-  "Feeding bottle": {
-    icon: "🍼",
-    color: "var(--powder-blue)",
-    productName: "Anti-Colic Feeding Bottle Set",
-    price: "AED 74",
-  },
-  "Crawling toys": {
-    icon: "🧸",
-    color: "var(--warm-sand)",
-    productName: "Crawling Sensory Toy Set",
-    price: "AED 67",
-  },
-  "Play mat": {
-    icon: "🧩",
-    color: "var(--soft-mint)",
-    productName: "Comfort Play Mat",
-    price: "AED 129",
-  },
-  "Baby-proofing essentials": {
-    icon: "🏠",
-    color: "var(--mist-lavender)",
-    productName: "Starter Safety Kit",
-    price: "AED 88",
-  },
-  "First walker shoes": {
-    icon: "👟",
-    color: "var(--powder-blue)",
-    productName: "Soft Sole First Walker Shoes",
-    price: "AED 79",
-  },
-  "Toddler socks": {
-    icon: "🧦",
-    color: "var(--pale-peach)",
-    productName: "Soft Grip Socks",
-    price: "AED 26",
-  },
-  "Outdoor stroller accessories": {
-    icon: "🌤️",
-    color: "var(--warm-sand)",
-    productName: "Stroller Travel Caddy",
-    price: "AED 54",
-  },
-  "Everyday essentials": {
-    icon: "✨",
-    color: "var(--blush-pink)",
-    productName: "Parent Favorites Bundle",
-    price: "AED 96",
-  },
+const PREPARATION_NOTES: Record<string, string> = {
+  "Baby cereal": "Gentle first-food starter",
+  "Soft spoons": "Easier for tiny mouths",
+  Bibs: "Keeps first meals calmer",
+  "High chair": "Comfortable feeding setup",
 };
 
-const CATEGORY_PREMIUM_ICON_MAP: Record<string, PremiumBabyIconName> = {
+const CATEGORY_ICON_MAP: Record<string, PremiumBabyIconName> = {
   "Baby cereal": "cereal",
   "Soft spoons": "spoon",
   Bibs: "bib",
@@ -120,58 +49,66 @@ const CATEGORY_PREMIUM_ICON_MAP: Record<string, PremiumBabyIconName> = {
   "First walker shoes": "shoe",
   "Toddler socks": "socks",
   "Outdoor stroller accessories": "stroller",
-  "Everyday essentials": "newborn",
 };
 
-function buildEssentials(categories: string[]): EssentialCard[] {
-  return categories.map((name, index) => {
-    const fallbackColors = [
-      "var(--pale-peach)",
-      "var(--soft-mint)",
-      "var(--blush-pink)",
-      "var(--mist-lavender)",
-      "var(--powder-blue)",
-      "var(--warm-sand)",
-    ];
-    const visual = CATEGORY_VISUALS[name] ?? {
-      icon: "✨",
-      color: fallbackColors[index % fallbackColors.length],
-      productName: name,
-      price: "AED 49",
-    };
+const STARTING_SOLIDS_ORDER = ["Baby cereal", "Soft spoons", "Bibs", "High chair"] as const;
 
-    return {
-      name,
-      iconName: CATEGORY_PREMIUM_ICON_MAP[name] ?? "newborn",
-      color: visual.color,
-    };
-  });
+const CURATED_PICKS: CuratedPick[] = [
+  {
+    title: "First Foods Prep Kit",
+    reason: "Helpful for first feeding",
+    iconName: "cereal",
+  },
+  {
+    title: "Soft Spoon & Bowl Set",
+    reason: "Easy to clean",
+    iconName: "spoon",
+  },
+  {
+    title: "Silicone Bib Set",
+    reason: "Parent-loved starter item",
+    iconName: "bib",
+  },
+];
+
+function getWarmSignalLabel(confidence: number): string {
+  if (confidence >= 80) {
+    return "Strong signal";
+  }
+
+  if (confidence >= 65) {
+    return "Steady signal";
+  }
+
+  return "Gentle signal";
 }
 
-function buildProducts(categories: string[], nextStage: string): ProductCard[] {
-  return categories.slice(0, 4).map((category, index) => {
-    const visual = CATEGORY_VISUALS[category] ?? CATEGORY_VISUALS["Everyday essentials"];
+function formatWindow(windowText: string): string {
+  return windowText.replaceAll("-", "–");
+}
 
-    return {
-      name: visual.productName,
-      rating: 4.7 + (index % 3) * 0.1,
-      reviews: 980 + index * 620,
-      price: visual.price,
-      reason:
-        index === 0
-          ? `Frequently chosen for ${nextStage.toLowerCase()}`
-          : index === 1
-            ? "Often picked by parents preparing ahead"
-            : index === 2
-              ? "A practical favorite for this chapter"
-              : "Helpful for a calm transition",
-      iconName: CATEGORY_PREMIUM_ICON_MAP[category] ?? "newborn",
-    };
-  });
+function buildPreparationCards(categories: string[]): PreparationCard[] {
+  const normalizedCategorySet = new Set(categories.map((category) => category.toLowerCase()));
+  const prioritized = STARTING_SOLIDS_ORDER.filter((category) =>
+    normalizedCategorySet.has(category.toLowerCase()),
+  );
+  const fallback = categories.filter(
+    (category) => !prioritized.includes(category as (typeof STARTING_SOLIDS_ORDER)[number]),
+  );
+
+  return [...prioritized, ...fallback].slice(0, 4).map((name) => ({
+    name,
+    note: PREPARATION_NOTES[name] ?? "A helpful essential for this stage",
+    iconName: CATEGORY_ICON_MAP[name] ?? "newborn",
+  }));
 }
 
 export default function StageDetail({ onNavigate }: { onNavigate: (screen: string) => void }) {
   const motionConfig = usePageMotion();
+  const [actionMessage, setActionMessage] = useState("");
+  const [savedPickTitles, setSavedPickTitles] = useState<string[]>([]);
+  const prepareRef = useRef<HTMLElement | null>(null);
+
   const families = familiesData as FamilyProfile[];
   const recommendations = recommendationsData as StageRecommendation[];
   const family =
@@ -187,288 +124,379 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
     tone: "gentle",
   });
 
+  const displayWindow = formatWindow(prediction.nextStageWindow);
+  const signalLabel = getWarmSignalLabel(prediction.confidence);
   const recommendedCategories =
-    recommendation?.recommendedCategories.map((category) =>
-      category
-        .split(" ")
-        .map((word) => `${word[0]?.toUpperCase() ?? ""}${word.slice(1)}`)
-        .join(" "),
-    ) ?? prediction.recommendedCategories;
-  const essentials = buildEssentials(recommendedCategories);
-  const products = buildProducts(recommendedCategories, prediction.nextStage);
+    prediction.nextStage === "Starting Solids"
+      ? [...STARTING_SOLIDS_ORDER]
+      : recommendation?.recommendedCategories.map((category) =>
+          category
+            .split(" ")
+            .map((word) => `${word[0]?.toUpperCase() ?? ""}${word.slice(1)}`)
+            .join(" "),
+        ) ?? prediction.recommendedCategories;
+  const preparationCards = buildPreparationCards(recommendedCategories);
+  const explanationSignals = prediction.explanationSignals.slice(0, 3);
+
+  function handlePrototypeAction(message: string) {
+    setActionMessage(message);
+  }
+
+  function scrollToPrepareSection() {
+    prepareRef.current?.scrollIntoView({
+      behavior: motionConfig.prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  }
+
+  function toggleSavedPick(title: string) {
+    setSavedPickTitles((current) => {
+      const exists = current.includes(title);
+      const next = exists ? current.filter((entry) => entry !== title) : [...current, title];
+
+      setActionMessage(
+        exists
+          ? `${title} was removed from your shortlist.`
+          : `${title} was saved to your shortlist.`,
+      );
+
+      return next;
+    });
+  }
 
   return (
     <div className="min-h-screen overflow-x-clip bg-[var(--warm-ivory)]">
-      {/* Background */}
-      <div className="fixed inset-0 opacity-20 pointer-events-none">
+      <div className="pointer-events-none fixed inset-0 opacity-70">
         <motion.div
-          className="absolute left-0 top-0 h-[340px] w-[340px] rounded-full sm:h-[600px] sm:w-[600px]"
-          style={{ background: "radial-gradient(circle, rgba(244, 178, 176, 0.3), transparent)" }}
-          animate={motionConfig.prefersReducedMotion ? undefined : { scale: [1, 1.3, 1], x: [0, 50, 0] }}
+          className="absolute left-0 top-0 h-80 w-80 rounded-full sm:h-[30rem] sm:w-[30rem]"
+          style={{ background: "radial-gradient(circle, rgba(248,216,213,0.46), transparent 64%)" }}
+          animate={motionConfig.floatAmbient}
           transition={motionConfig.prefersReducedMotion ? undefined : { duration: 12, repeat: Infinity }}
         />
         <motion.div
-          className="absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full sm:h-[500px] sm:w-[500px]"
-          style={{ background: "radial-gradient(circle, rgba(222, 58, 87, 0.16), transparent)" }}
-          animate={motionConfig.prefersReducedMotion ? undefined : { scale: [1.2, 1, 1.2], x: [0, -50, 0] }}
-          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 10, repeat: Infinity }}
+          className="absolute bottom-0 right-0 h-72 w-72 rounded-full sm:h-[26rem] sm:w-[26rem]"
+          style={{ background: "radial-gradient(circle, rgba(243,230,220,0.72), transparent 62%)" }}
+          animate={motionConfig.floatAmbient}
+          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 14, repeat: Infinity }}
         />
       </div>
 
-      {/* Header */}
-      <motion.div
-        className="relative z-10 px-4 pb-6 pt-8 sm:px-6"
-        {...motionConfig.getReveal({ direction: "down" })}
-      >
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-8 flex items-start gap-4">
-            <motion.button
-              aria-label="Back to timeline"
-              className="w-10 h-10 rounded-full bg-white/60 border border-[var(--border)] flex items-center justify-center"
-              whileHover={motionConfig.iconButtonHover}
-              whileTap={motionConfig.iconTap}
-              onClick={() => onNavigate("timeline")}
+      <div className="relative z-10 mx-auto max-w-5xl px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+        <motion.div
+          className="mx-auto max-w-3xl text-center"
+          {...motionConfig.getReveal({ direction: "down", duration: 0.55 })}
+        >
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[rgba(248,216,213,0.55)] px-4 py-2 text-sm text-[var(--deep-berry)]">
+            <Sparkles className="h-4 w-4" />
+            <span>Next Chapter</span>
+          </div>
+
+          <h1 className="text-[2.1rem] text-[var(--deep-plum)] sm:text-[2.8rem]">
+            {prediction.nextStage}
+          </h1>
+          <p className="mt-3 text-base text-[var(--muted-mauve)] sm:text-lg">
+            Likely in the next {displayWindow} for {family.babyName}.
+          </p>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            {[
+              family.babyName,
+              `${prediction.predictedAgeMonths} months`,
+              signalLabel,
+            ].map((chip) => (
+              <span
+                key={chip}
+                className="rounded-full border border-[rgba(42,18,18,0.08)] bg-white/88 px-4 py-2 text-sm text-[var(--deep-plum)] shadow-[0_10px_24px_rgba(42,18,18,0.04)]"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+
+          {actionMessage ? (
+            <p
+              className="mt-5 inline-flex rounded-full border border-[rgba(42,18,18,0.08)] bg-white/90 px-4 py-2 text-sm text-[var(--muted-mauve)] shadow-[0_12px_26px_rgba(42,18,18,0.04)]"
+              role="status"
+              aria-live="polite"
             >
-              <ArrowLeft className="w-5 h-5 text-[var(--deep-plum)]" />
-            </motion.button>
-            <div>
-              <h1 className="text-2xl text-[var(--deep-plum)] sm:text-3xl">Your baby&rsquo;s next chapter: {prediction.nextStage}</h1>
-              <p className="text-[var(--muted-mauve)]">
-                {family.babyName}&rsquo;s predicted window is {prediction.nextStageWindow} with {prediction.confidence}% confidence
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Content */}
-      <div className="relative z-10 mx-auto max-w-5xl space-y-8 px-4 pb-16 sm:px-6">
-        {/* Why This Matters */}
-        <motion.div
-          className="mumz-card rounded-3xl p-6 sm:p-8"
-          {...motionConfig.getReveal({ delay: 0.2 })}
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--blush-pink)] to-[var(--mist-lavender)] flex items-center justify-center flex-shrink-0">
-              <Heart className="w-6 h-6 text-[var(--rose)]" />
-            </div>
-            <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                <h2 className="text-xl text-[var(--deep-plum)]">Why this matters</h2>
-                <span className="mumz-badge rounded-full px-3 py-1 text-xs text-[var(--deep-plum)]">
-                  Prepared with local lifecycle rules
-                </span>
-              </div>
-              <p className="text-[var(--muted-mauve)] leading-relaxed mb-4">
-                {recommendation?.message ??
-                  `${family.babyName}&rsquo;s next chapter looks like ${prediction.nextStage.toLowerCase()}. Gentle preparation can make the transition feel calmer and easier.`}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {prediction.explanationSignals.map((signal, index) => (
-                  <motion.div
-                    key={signal}
-                    className="flex items-start gap-3 rounded-2xl bg-[var(--warm-ivory)] px-4 py-3"
-                    {...motionConfig.getReveal({ delay: 0.3 + index * 0.08, direction: "left", distance: 20 })}
-                  >
-                    <div className="mt-1 w-2 h-2 rounded-full bg-[var(--rose)]" />
-                    <p className="text-sm text-[var(--muted-mauve)]">{signal}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
+              {actionMessage}
+            </p>
+          ) : null}
         </motion.div>
 
-        {/* Recommended Essentials */}
-        <motion.div
-          className="mumz-card rounded-3xl p-6 sm:p-8"
-          {...motionConfig.getReveal({ delay: 0.3 })}
+        <motion.section
+          className="mumz-card mt-10 overflow-hidden rounded-[2rem] p-6 sm:p-8 lg:p-10"
+          {...motionConfig.getReveal({ delay: 0.12, duration: 0.55 })}
         >
-          <div className="mb-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-xl text-[var(--deep-plum)]">Recommended essentials</h2>
-            <span className="text-sm text-[var(--muted-mauve)]">Next best action: {prediction.nextBestAction}</span>
+          <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10">
+            <div className="flex flex-col justify-center">
+              <h2 className="text-[2rem] leading-[1.08] text-[var(--deep-plum)] sm:text-[2.45rem]">
+                A calm start to solids
+              </h2>
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--muted-mauve)] sm:text-lg">
+                Starting solids can feel like a big step. A few simple essentials can make the first week calmer and easier.
+              </p>
+
+              <div className="mt-7">
+                <motion.button
+                  type="button"
+                  className="mumz-primary-button rounded-full px-6 py-3.5 text-white"
+                  whileHover={motionConfig.buttonHoverStrong}
+                  whileTap={motionConfig.gentleTap}
+                  onClick={scrollToPrepareSection}
+                >
+                  See what may help
+                </motion.button>
+              </div>
+
+              <div className="mt-8 rounded-[1.5rem] border border-[rgba(42,18,18,0.08)] bg-[rgba(255,251,247,0.92)] px-4 py-4">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">Current</p>
+                    <p className="mt-1 text-sm text-[var(--deep-plum)]">{prediction.currentStage}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">Next</p>
+                    <p className="mt-1 text-sm text-[var(--deep-plum)]">{prediction.nextStage}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">Window</p>
+                    <p className="mt-1 text-sm text-[var(--deep-plum)]">{displayWindow}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-[rgba(42,18,18,0.08)] bg-[linear-gradient(180deg,rgba(255,251,247,0.96),rgba(243,230,220,0.82))] p-5 shadow-[0_18px_36px_rgba(42,18,18,0.04)] sm:p-6">
+              <div className="flex h-full min-h-[18rem] flex-col justify-between rounded-[1.7rem] border border-[rgba(42,18,18,0.06)] bg-[rgba(255,255,255,0.72)] p-6">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="rounded-full bg-[rgba(248,216,213,0.55)] px-3 py-1 text-xs text-[var(--deep-berry)]">
+                    Stage image placeholder
+                  </span>
+                  <span className="text-xs text-[var(--muted-mauve)]">{signalLabel}</span>
+                </div>
+
+                <div className="flex flex-1 items-center justify-center">
+                  <div className="relative flex h-44 w-full max-w-[18rem] items-center justify-center rounded-[1.8rem] bg-[linear-gradient(180deg,rgba(248,216,213,0.42),rgba(255,251,247,0.96))]">
+                    <div className="absolute inset-x-6 bottom-8 h-3 rounded-full bg-[rgba(42,18,18,0.06)] blur-md" />
+                    <div className="flex h-24 w-24 items-center justify-center rounded-[1.5rem] bg-white/86 shadow-[0_16px_28px_rgba(42,18,18,0.06)]">
+                      <PremiumBabyIcon name="chair" className="h-14 w-14" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-[1.2rem] bg-[rgba(255,251,247,0.88)] px-4 py-3">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">Why this matters</p>
+                    <p className="mt-2 text-sm text-[var(--deep-plum)]">
+                      {recommendation?.message ?? "A few calm essentials can make this next chapter feel easier."}
+                    </p>
+                  </div>
+                  <div className="rounded-[1.2rem] bg-[rgba(255,251,247,0.88)] px-4 py-3">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">Helpful note</p>
+                    <p className="mt-2 text-sm text-[var(--deep-plum)]">
+                      A little preparation now can make the first few meals feel calmer.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {essentials.map((item, idx) => (
-              <motion.div
+        </motion.section>
+
+        <motion.section
+          ref={prepareRef}
+          className="mt-10"
+          {...motionConfig.getReveal({ delay: 0.2, duration: 0.5 })}
+        >
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h3 className="text-[1.45rem] text-[var(--deep-plum)]">What to prepare</h3>
+              <p className="mt-1 text-[var(--muted-mauve)]">A few gentle essentials for this first week.</p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {preparationCards.map((item, index) => (
+              <motion.article
                 key={item.name}
-                className="cursor-pointer rounded-2xl border border-[var(--border)] p-4 text-center sm:p-6"
-                style={{ backgroundColor: item.color }}
-                {...motionConfig.getReveal({ delay: 0.4 + idx * 0.1, direction: "scale", scale: 0.9 })}
-                whileHover={motionConfig.cardHoverScale}
+                className="mumz-card-soft rounded-[1.75rem] p-5 sm:p-6"
+                {...motionConfig.getReveal({ delay: 0.24 + index * 0.08, direction: "up", distance: 18, duration: 0.45 })}
+                whileHover={motionConfig.cardHoverSoft}
               >
-                <div className="mb-3 flex justify-center">
-                  <PremiumBabyIcon name={item.iconName} className="h-12 w-12 sm:h-14 sm:w-14" />
-                </div>
-                <p className="text-sm text-[var(--deep-plum)]">{item.name}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Parent-Loved Picks */}
-        <motion.div
-          className="rounded-3xl border border-[rgba(165,13,37,0.08)] bg-[linear-gradient(160deg,rgba(255,248,245,0.98),rgba(244,178,176,0.34))] p-6 sm:p-8"
-          {...motionConfig.getReveal({ delay: 0.5 })}
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center">
-              <Star className="w-5 h-5 text-[var(--coral)]" fill="currentColor" />
-            </div>
-            <div>
-              <h2 className="text-xl text-[var(--deep-plum)]">Parent-loved picks</h2>
-              <p className="text-sm text-[var(--muted-mauve)]">{family.babyName}&rsquo;s likely stage: {prediction.nextStage}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {products.map((product, idx) => (
-              <motion.div
-                key={product.name}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-white/60"
-                {...motionConfig.getReveal({ delay: 0.6 + idx * 0.1, direction: "left", distance: 20 })}
-                whileHover={motionConfig.cardHover}
-              >
-                <div className="flex flex-col gap-4 sm:flex-row">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--blush-pink)] to-[var(--mist-lavender)] sm:flex-shrink-0">
-                    <PremiumBabyIcon name={product.iconName} className="h-12 w-12" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-[var(--deep-plum)] mb-2">{product.name}</h3>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-3 h-3 ${i < Math.floor(product.rating) ? "text-[var(--coral)]" : "text-gray-300"}`}
-                            fill={i < Math.floor(product.rating) ? "currentColor" : "none"}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs text-[var(--muted-mauve)]">
-                        {product.rating.toFixed(1)} ({product.reviews.toLocaleString()})
-                      </span>
-                    </div>
-                    <p className="text-sm text-[var(--muted-mauve)] mb-3">{product.reason}</p>
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-lg text-[var(--rose)]">{product.price}</p>
-                      <motion.button
-                        aria-label={`Add ${product.name}`}
-                        className="mumz-primary-button rounded-full px-4 py-2 text-sm text-white"
-                        whileHover={motionConfig.buttonHoverStrong}
-                        whileTap={motionConfig.gentleTap}
-                      >
-                        <ShoppingCart className="w-4 h-4" />
-                      </motion.button>
-                    </div>
+                <div className="mb-5 rounded-[1.35rem] bg-[linear-gradient(180deg,rgba(248,216,213,0.44),rgba(255,251,247,0.96))] p-5">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-white/82 shadow-[0_12px_24px_rgba(42,18,18,0.04)]">
+                    <PremiumBabyIcon name={item.iconName} className="h-8 w-8" />
                   </div>
                 </div>
-              </motion.div>
+                <h4 className="text-lg text-[var(--deep-plum)]">{item.name}</h4>
+                <p className="mt-2 text-sm text-[var(--muted-mauve)]">{item.note}</p>
+              </motion.article>
             ))}
           </div>
-        </motion.div>
+        </motion.section>
 
-        {/* Helpful Guide */}
-        <motion.div
-          className="mumz-card rounded-3xl p-6 sm:p-8"
-          {...motionConfig.getReveal({ delay: 0.8 })}
-        >
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="flex flex-1 items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--soft-mint)] to-[var(--powder-blue)] flex items-center justify-center flex-shrink-0">
-                <TrendingUp className="w-6 h-6 text-[var(--soft-teal)]" />
+        <div className="mt-10 grid gap-6 lg:grid-cols-[1.12fr_0.88fr]">
+          <motion.section
+            className="rounded-[2rem] border border-[rgba(42,18,18,0.08)] bg-[linear-gradient(180deg,rgba(255,251,247,0.98),rgba(248,216,213,0.26))] p-6 shadow-[0_18px_38px_rgba(42,18,18,0.05)] sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.3, duration: 0.5 })}
+          >
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-white/82">
+                <PremiumBabyIcon name="spoon" className="h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-xl text-[var(--deep-plum)] mb-2">Helpful guide</h2>
-                <p className="text-[var(--muted-mauve)] mb-4">
-                  {prediction.nextBestAction}. A few calm steps can make {prediction.nextStage.toLowerCase()} feel more manageable.
-                </p>
-                <ul className="space-y-2 text-[var(--muted-mauve)]">
-                  {prediction.explanationSignals.slice(0, 4).map((signal) => (
-                    <li key={signal} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[var(--soft-teal)]" />
-                      {signal}
-                    </li>
-                  ))}
-                </ul>
+                <h3 className="text-[1.35rem] text-[var(--deep-plum)]">Curated picks</h3>
+                <p className="text-sm text-[var(--muted-mauve)]">A few parent-loved starters for this chapter.</p>
               </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              {CURATED_PICKS.map((pick, index) => {
+                const isSaved = savedPickTitles.includes(pick.title);
+
+                return (
+                  <motion.article
+                    key={pick.title}
+                    className="rounded-[1.5rem] border border-[rgba(42,18,18,0.08)] bg-white/86 p-5"
+                    {...motionConfig.getReveal({ delay: 0.34 + index * 0.08, direction: "left", distance: 16, duration: 0.4 })}
+                    whileHover={motionConfig.cardHoverSoft}
+                  >
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-[1rem] bg-[rgba(243,230,220,0.78)]">
+                      <PremiumBabyIcon name={pick.iconName} className="h-7 w-7" />
+                    </div>
+                    <h4 className="text-base text-[var(--deep-plum)]">{pick.title}</h4>
+                    <p className="mt-2 text-sm text-[var(--muted-mauve)]">{pick.reason}</p>
+                    <motion.button
+                      type="button"
+                      className="mt-4 text-sm text-[var(--deep-berry)] underline decoration-[rgba(143,16,37,0.24)] underline-offset-4"
+                      whileHover={motionConfig.buttonHover}
+                      whileTap={motionConfig.gentleTap}
+                      onClick={() => toggleSavedPick(pick.title)}
+                    >
+                      {isSaved ? "Saved to shortlist" : "Save to shortlist"}
+                    </motion.button>
+                  </motion.article>
+                );
+              })}
+            </div>
+          </motion.section>
+
+          <motion.section
+            className="mumz-card rounded-[2rem] p-6 sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.34, duration: 0.5 })}
+            whileHover={motionConfig.cardHoverSoft}
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[rgba(221,239,229,0.84)]">
+              <BookOpen className="h-5 w-5 text-[var(--soft-espresso)]" />
+            </div>
+            <h3 className="mt-5 text-[1.35rem] text-[var(--deep-plum)]">First foods checklist</h3>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--muted-mauve)] sm:text-base">
+              A simple guide to help prepare for the first week of solids.
+            </p>
+            <div className="mt-5 space-y-3">
+              {explanationSignals.map((signal) => (
+                <div
+                  key={signal}
+                  className="rounded-[1.2rem] bg-[rgba(255,251,247,0.92)] px-4 py-3 text-sm text-[var(--muted-mauve)]"
+                >
+                  {signal}
+                </div>
+              ))}
             </div>
             <motion.button
-              className="mumz-subtle-button w-full rounded-full px-6 py-3 text-[var(--deep-plum)] lg:w-auto"
+              type="button"
+              className="mumz-secondary-button mt-6 rounded-full px-5 py-3 text-[var(--deep-plum)]"
               whileHover={motionConfig.buttonHover}
               whileTap={motionConfig.gentleTap}
+              onClick={() => handlePrototypeAction("The checklist is still a local prototype action in this demo.")}
             >
-              Read Full Guide
+              View the checklist
             </motion.button>
-          </div>
-        </motion.div>
+          </motion.section>
+        </div>
 
-        {/* English-Only Template Journey Card */}
-        <motion.div
-          className="rounded-3xl border border-[rgba(165,13,37,0.08)] bg-[linear-gradient(160deg,rgba(255,250,248,0.98),rgba(250,225,226,0.7))] p-6 sm:p-8"
-          {...motionConfig.getReveal({ delay: 1 })}
-        >
-          <div className="flex items-start gap-4 mb-6">
-            <div className="w-12 h-12 rounded-full bg-white/60 flex items-center justify-center">
-              <Globe className="w-6 h-6 text-[var(--deep-plum)]" />
-            </div>
-            <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <h2 className="text-xl text-[var(--deep-plum)]">Next Chapter message preview</h2>
-                <span className="px-3 py-1 rounded-full bg-white/70 text-xs text-[var(--deep-plum)]">English-only template</span>
+        <div className="mt-10 grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
+          <motion.section
+            className="rounded-[2rem] border border-[rgba(42,18,18,0.08)] bg-[linear-gradient(180deg,rgba(255,250,248,0.98),rgba(248,216,213,0.22))] p-6 shadow-[0_18px_38px_rgba(42,18,18,0.05)] sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.4, duration: 0.5 })}
+          >
+            <div className="mb-5 flex items-start gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/82">
+                <Sparkles className="h-5 w-5 text-[var(--deep-berry)]" />
               </div>
-              <div className="space-y-4">
-                <div className="bg-white/90 rounded-2xl p-5 border border-white/60">
-                  <p className="text-sm text-[var(--muted-mauve)] mb-1">Journey preview</p>
-                  <p className="text-lg text-[var(--deep-plum)] mb-2">{journeyCard.title}</p>
-                  <p className="text-[var(--deep-plum)] leading-relaxed mb-4">{journeyCard.body}</p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {journeyCard.recommendedCategories.map((category) => (
-                      <span key={category} className="px-3 py-1 rounded-full bg-[var(--warm-ivory)] text-xs text-[var(--deep-plum)]">
-                        {category}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-sm text-[var(--rose)]">{journeyCard.gentleCTA}</p>
-                </div>
-                <div className="bg-white/90 rounded-2xl p-5 border border-white/60">
-                  <p className="text-sm text-[var(--muted-mauve)] mb-1">Future scope</p>
-                  <p className="text-[var(--deep-plum)] leading-relaxed">
-                    Arabic localization can be added later with verified translations.
-                  </p>
-                </div>
+              <div>
+                <h3 className="text-[1.35rem] text-[var(--deep-plum)]">Journey message</h3>
+                <p className="mt-1 text-sm text-[var(--muted-mauve)]">A warm message prepared for this next chapter.</p>
               </div>
             </div>
-          </div>
-        </motion.div>
 
-        {/* CTA Section */}
+            <div className="rounded-[1.6rem] border border-[rgba(42,18,18,0.08)] bg-white/88 p-5 sm:p-6">
+              <p className="text-lg text-[var(--deep-plum)]">{journeyCard.title}</p>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted-mauve)] sm:text-base">
+                {journeyCard.body}
+              </p>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {journeyCard.recommendedCategories.slice(0, 4).map((category) => (
+                  <span
+                    key={category}
+                    className="rounded-full bg-[rgba(255,251,247,0.92)] px-3 py-1 text-xs text-[var(--deep-plum)]"
+                  >
+                    {category}
+                  </span>
+                ))}
+              </div>
+
+              <motion.button
+                type="button"
+                className="mumz-primary-button mt-6 rounded-full px-6 py-3.5 text-white"
+                whileHover={motionConfig.buttonHoverStrong}
+                whileTap={motionConfig.gentleTap}
+                onClick={() => handlePrototypeAction("This preparation flow is still a prototype in this demo.")}
+              >
+                Prepare for this stage
+              </motion.button>
+            </div>
+          </motion.section>
+
+          <motion.section
+            className="mumz-card rounded-[2rem] p-6 sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.44, duration: 0.5 })}
+            whileHover={motionConfig.cardHoverSoft}
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[rgba(248,216,213,0.58)]">
+              <Edit3 className="h-5 w-5 text-[var(--deep-berry)]" />
+            </div>
+            <h3 className="mt-5 text-[1.35rem] text-[var(--deep-plum)]">Every baby grows differently</h3>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--muted-mauve)] sm:text-base">
+              If this does not feel right for {family.babyName}, you can update the stage anytime.
+            </p>
+            <motion.button
+              type="button"
+              className="mumz-secondary-button mt-6 rounded-full px-5 py-3 text-[var(--deep-plum)]"
+              whileHover={motionConfig.buttonHover}
+              whileTap={motionConfig.gentleTap}
+              onClick={() => handlePrototypeAction("Editing the baby stage is still a prototype action in this demo.")}
+            >
+              Edit baby stage
+            </motion.button>
+          </motion.section>
+        </div>
+
         <motion.div
-          className="flex flex-col sm:flex-row gap-4"
-          {...motionConfig.getReveal({ delay: 1.2, distance: 20 })}
+          className="mt-8 flex justify-start"
+          {...motionConfig.getReveal({ delay: 0.48, duration: 0.45 })}
         >
           <motion.button
-            className="mumz-primary-button flex-1 rounded-full px-8 py-4 text-lg text-white"
-            whileHover={motionConfig.buttonHoverStrong}
-            whileTap={motionConfig.gentleTap}
-          >
-            Save these essentials
-          </motion.button>
-          <motion.button
-            className="mumz-secondary-button flex items-center justify-center gap-2 rounded-full px-8 py-4 text-[var(--deep-plum)]"
+            type="button"
+            className="inline-flex items-center gap-2 text-sm text-[var(--deep-berry)]"
             whileHover={motionConfig.buttonHover}
             whileTap={motionConfig.gentleTap}
+            onClick={() => onNavigate("parent")}
           >
-            <MessageCircle className="w-5 h-5" />
-            Share the guide
-          </motion.button>
-          <motion.button
-            className="mumz-secondary-button flex items-center justify-center gap-2 rounded-full px-8 py-4 text-[var(--deep-plum)]"
-            whileHover={motionConfig.buttonHover}
-            whileTap={motionConfig.gentleTap}
-          >
-            <Sparkles className="w-5 h-5" />
-            Review message preview
+            Return to the parent feed
+            <ArrowRight className="h-4 w-4" />
           </motion.button>
         </motion.div>
       </div>

@@ -1,8 +1,24 @@
 "use client";
 
 import { motion } from "motion/react";
-import { TrendingUp, Users, AlertCircle, Sparkles, ChevronRight, ArrowLeft } from "lucide-react";
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  BellRing,
+  ClipboardList,
+  FileText,
+  ShieldCheck,
+  Sparkles,
+  Users,
+} from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { useEffect, useRef, useState } from "react";
 
 import familiesData from "../data/families.json";
@@ -14,7 +30,7 @@ import type { FamilyProfile, JourneyCard, JourneyTone, StagePredictionResult } f
 type FamilyInsight = {
   family: FamilyProfile;
   prediction: StagePredictionResult;
-  lastPurchase: string;
+  demoLabel: string;
 };
 
 type GeneratedJourneyPreview = {
@@ -24,134 +40,58 @@ type GeneratedJourneyPreview = {
   card: JourneyCard;
 };
 
-const KPI_CARD_COLORS = [
-  "from-[var(--rose)] to-[var(--coral)]",
-  "from-[var(--soft-teal)] to-[var(--blush-pink)]",
-  "from-[var(--coral)] to-[var(--pale-peach)]",
-  "from-[var(--dusty-rose)] to-[var(--mist-lavender)]",
-  "from-[var(--powder-blue)] to-[var(--soft-mint)]",
-];
-
-const FUNNEL_STAGES = ["Newborn Care", "Feeding Routine", "Starting Solids", "Crawling Prep", "First Shoes"] as const;
-const FUNNEL_STAGE_COLORS: Record<string, string> = {
-  "Newborn Care": "var(--soft-mint)",
-  "Feeding Routine": "var(--pale-peach)",
-  "Starting Solids": "var(--blush-pink)",
-  "Crawling Prep": "var(--mist-lavender)",
-  "First Shoes": "var(--powder-blue)",
-};
-
-const TEMPLATE_STAGE_OPTIONS = ["Newborn Care", "Feeding Routine", "Starting Solids", "Crawling Prep", "First Shoes"] as const;
-const LOADING_STEPS = [
-  "Reading purchase journey",
-  "Inferring baby stage",
-  "Matching lifecycle pattern",
-  "Preparing template journey",
+const DISTRIBUTION_STAGES = [
+  "Newborn Care",
+  "Feeding Routine",
+  "Starting Solids",
+  "Crawling Prep",
+  "First Shoes",
 ] as const;
 
-const RISK_PRIORITY: Record<string, number> = {
-  High: 0,
-  Medium: 1,
-  Low: 2,
-};
+const STAGE_COLORS = ["#F8D8D5", "#F3E6DC", "#C92F4B", "#DDEFE5", "#8F1025"];
+const TEMPLATE_STAGE_OPTIONS = [
+  "Newborn Care",
+  "Feeding Routine",
+  "Starting Solids",
+  "Crawling Prep",
+  "First Shoes",
+] as const;
+const LOADING_STEPS = [
+  "Reviewing the demo family journey",
+  "Checking recent stage signals",
+  "Matching the next chapter",
+  "Preparing the template journey",
+] as const;
 
-function getStageIndex(stageName: string): number {
-  return FUNNEL_STAGES.indexOf(stageName as (typeof FUNNEL_STAGES)[number]);
-}
-
-function getLatestPurchaseName(family: FamilyProfile): string {
-  const latestPurchase = [...family.purchaseHistory].sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  })[0];
-
-  return latestPurchase?.productName ?? "No purchase history";
+function formatDemoLabel(index: number): string {
+  return `Demo family ${String(index + 1).padStart(2, "0")}`;
 }
 
 export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: string) => void }) {
   const timeoutIdsRef = useRef<number[]>([]);
+  const gentleReminderRef = useRef<HTMLDivElement | null>(null);
   const motionConfig = usePageMotion();
 
-  const insights: FamilyInsight[] = (familiesData as FamilyProfile[]).map((family) => ({
+  const insights: FamilyInsight[] = (familiesData as FamilyProfile[]).map((family, index) => ({
     family,
     prediction: predictBabyStage(family),
-    lastPurchase: getLatestPurchaseName(family),
+    demoLabel: formatDemoLabel(index),
   }));
 
   const totalFamilies = insights.length;
-  const familiesWithPredictedNextStage = insights.filter((entry) => !!entry.prediction.nextStage).length;
   const startingSolidsSoon = insights.filter((entry) => entry.prediction.nextStage === "Starting Solids").length;
-  const diaperTransitionExpected = insights.filter((entry) => entry.prediction.nextStage.startsWith("Diaper Size")).length;
-  const atRiskFamiliesCount = insights.filter((entry) => entry.prediction.riskLevel !== "Low").length;
+  const crawlingPrepSoon = insights.filter((entry) => entry.prediction.nextStage === "Crawling Prep").length;
+  const firstShoesSoon = insights.filter((entry) => entry.prediction.nextStage === "First Shoes").length;
+  const atRiskFamilies = insights.filter((entry) => entry.prediction.riskLevel !== "Low");
   const templateJourneysPrepared = insights.length;
 
-  const kpiData = [
-    {
-      label: "Total families",
-      value: totalFamilies.toString(),
-      trend: `${Math.round((totalFamilies / Math.max(totalFamilies, 1)) * 100)}% mock coverage`,
-      color: KPI_CARD_COLORS[0],
-    },
-    {
-      label: "Families with predicted next stage",
-      value: familiesWithPredictedNextStage.toString(),
-      trend: `${Math.round((familiesWithPredictedNextStage / Math.max(totalFamilies, 1)) * 100)}% of families`,
-      color: KPI_CARD_COLORS[1],
-    },
-    {
-      label: "Starting solids soon",
-      value: startingSolidsSoon.toString(),
-      trend: `${Math.round((startingSolidsSoon / Math.max(totalFamilies, 1)) * 100)}% preparing soon`,
-      color: KPI_CARD_COLORS[2],
-    },
-    {
-      label: "Diaper transition expected",
-      value: diaperTransitionExpected.toString(),
-      trend: `${Math.round((diaperTransitionExpected / Math.max(totalFamilies, 1)) * 100)}% in transition`,
-      color: KPI_CARD_COLORS[3],
-    },
-    {
-      label: "At-risk families",
-      value: atRiskFamiliesCount.toString(),
-      trend: `${Math.round((atRiskFamiliesCount / Math.max(totalFamilies, 1)) * 100)}% need follow-up`,
-      color: KPI_CARD_COLORS[4],
-    },
-  ];
-
-  const funnelData = FUNNEL_STAGES.map((stage) => {
-    const targetIndex = getStageIndex(stage);
-    const families = insights.filter((entry) => {
-      const currentIndex = getStageIndex(entry.prediction.currentStage);
-      const nextIndex = getStageIndex(entry.prediction.nextStage);
-
-      return (
-        currentIndex >= targetIndex ||
-        nextIndex >= targetIndex ||
-        entry.prediction.nextThreeStages.includes(stage)
-      );
-    }).length;
-
-    return {
-      stage,
-      families,
-      color: FUNNEL_STAGE_COLORS[stage],
-    };
-  });
-
-  const chartData = FUNNEL_STAGES.map((stage) => ({
+  const stageDistributionData = DISTRIBUTION_STAGES.map((stage, index) => ({
     stage,
-    currentFamilies: insights.filter((entry) => entry.prediction.currentStage === stage).length,
-    nextStageFamilies: insights.filter((entry) => entry.prediction.nextStage === stage).length,
+    families: insights.filter(
+      (entry) => entry.prediction.currentStage === stage || entry.prediction.nextStage === stage,
+    ).length,
+    color: STAGE_COLORS[index],
   }));
-
-  const familyTableRows = [...insights].sort((a, b) => {
-    const riskDelta = RISK_PRIORITY[a.prediction.riskLevel] - RISK_PRIORITY[b.prediction.riskLevel];
-
-    if (riskDelta !== 0) {
-      return riskDelta;
-    }
-
-    return b.family.daysSilent - a.family.daysSilent;
-  });
 
   const explainabilityExample =
     insights.find((entry) => entry.family.parentName === "Sara" && entry.family.babyName === "Omar") ??
@@ -166,6 +106,7 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
   );
   const [selectedTone, setSelectedTone] = useState<JourneyTone>("gentle");
   const [selectedChannel, setSelectedChannel] = useState("Email");
+  const [actionMessage, setActionMessage] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStepIndex, setLoadingStepIndex] = useState(-1);
   const [generatedJourney, setGeneratedJourney] = useState<GeneratedJourneyPreview | null>(null);
@@ -175,7 +116,7 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
     timeoutIdsRef.current = [];
   }
 
-  function handleGenerateJourney() {
+  function handlePrepareJourney() {
     clearPendingTimeouts();
 
     const matchedFamily =
@@ -186,11 +127,12 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
     setIsGenerating(true);
     setLoadingStepIndex(0);
     setGeneratedJourney(null);
+    setActionMessage("");
 
     LOADING_STEPS.forEach((_, index) => {
       const timeoutId = window.setTimeout(() => {
         setLoadingStepIndex(index);
-      }, index * 500);
+      }, index * 520);
 
       timeoutIdsRef.current.push(timeoutId);
     });
@@ -207,9 +149,16 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
         }),
       });
       setIsGenerating(false);
-    }, LOADING_STEPS.length * 500 + 250);
+    }, LOADING_STEPS.length * 520 + 260);
 
     timeoutIdsRef.current.push(finalTimeoutId);
+  }
+
+  function scrollToGentleReminderSection() {
+    gentleReminderRef.current?.scrollIntoView({
+      behavior: motionConfig.prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
   }
 
   useEffect(() => {
@@ -220,279 +169,303 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
 
   return (
     <div className="min-h-screen overflow-x-clip bg-[var(--warm-ivory)]">
-      {/* Background */}
-      <div className="fixed inset-0 opacity-10 pointer-events-none">
+      <div className="pointer-events-none fixed inset-0 opacity-70">
         <motion.div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(at 30% 20%, rgba(244, 178, 176, 0.3), transparent), radial-gradient(at 70% 80%, rgba(222, 58, 87, 0.16), transparent)",
-          }}
-          animate={motionConfig.prefersReducedMotion ? undefined : { opacity: [0.1, 0.2, 0.1] }}
-          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 10, repeat: Infinity }}
+          className="absolute left-0 top-0 h-80 w-80 rounded-full sm:h-[30rem] sm:w-[30rem]"
+          style={{ background: "radial-gradient(circle, rgba(248,216,213,0.46), transparent 64%)" }}
+          animate={motionConfig.floatAmbient}
+          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 12, repeat: Infinity }}
+        />
+        <motion.div
+          className="absolute bottom-0 right-0 h-72 w-72 rounded-full sm:h-[26rem] sm:w-[26rem]"
+          style={{ background: "radial-gradient(circle, rgba(243,230,220,0.72), transparent 62%)" }}
+          animate={motionConfig.floatAmbient}
+          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 14, repeat: Infinity }}
         />
       </div>
 
-      {/* Header */}
-      <motion.div
-        className="relative z-10 border-b border-[var(--border)] bg-white/60 px-4 pb-6 pt-8 backdrop-blur-md sm:px-6 lg:px-8"
-        {...motionConfig.getReveal({ direction: "down" })}
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-start gap-4">
-              <motion.button
-                aria-label="Back to landing page"
-                className="w-10 h-10 rounded-full bg-white border border-[var(--border)] flex items-center justify-center"
-                whileHover={motionConfig.iconButtonHover}
-                whileTap={motionConfig.iconTap}
-                onClick={() => onNavigate("landing")}
-              >
-                <ArrowLeft className="w-5 h-5 text-[var(--deep-plum)]" />
-              </motion.button>
-              <div>
-                <h1 className="text-2xl text-[var(--deep-plum)] sm:text-3xl">MumzMind CRM Dashboard</h1>
-                <p className="text-[var(--muted-mauve)]">Review family stages, prepare next journeys, and notice quiet families early</p>
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 rounded-full border border-[rgba(165,13,37,0.08)] bg-[rgba(255,251,250,0.9)] px-4 py-2 text-[var(--deep-plum)] shadow-[0_12px_28px_rgba(37,0,0,0.06)] sm:px-5">
-              <Sparkles className="w-4 h-4" />
-              <span className="text-sm">{templateJourneysPrepared} template journeys prepared</span>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Content */}
-      <div className="relative z-10 mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
-          {kpiData.map((kpi, idx) => (
-            <motion.div
-              key={kpi.label}
-              className="mumz-card relative overflow-hidden rounded-3xl p-6"
-              {...motionConfig.getReveal({ delay: 0.1 * idx })}
-              whileHover={motionConfig.cardHover}
-            >
-              <div className={`absolute top-0 right-0 h-32 w-32 rounded-full bg-gradient-to-br ${kpi.color} opacity-12 blur-3xl`} />
-              <div className="relative z-10">
-                <p className="text-sm text-[var(--muted-mauve)] mb-2">{kpi.label}</p>
-                <p className="text-3xl text-[var(--deep-plum)] mb-2">{kpi.value}</p>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-[var(--soft-teal)]" />
-                  <span className="text-sm text-[var(--soft-teal)]">{kpi.trend}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Stage Prediction Funnel & Chart */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <motion.div
-            className="mumz-card rounded-3xl p-6 sm:p-8"
-            {...motionConfig.getReveal({ delay: 0.4, direction: "left", distance: 40 })}
-          >
-            <h2 className="text-xl text-[var(--deep-plum)] mb-2">Stage Prediction Funnel</h2>
-            <p className="text-sm text-[var(--muted-mauve)] mb-6">Families that have reached or are approaching each lifecycle stage</p>
-            <div className="space-y-4">
-              {funnelData.map((stage, idx) => (
-                <motion.div
-                  key={stage.stage}
-                  {...motionConfig.getReveal({ delay: 0.5 + idx * 0.1, direction: "left", distance: 20 })}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-[var(--deep-plum)]">{stage.stage}</span>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm text-[var(--muted-mauve)]">{stage.families.toLocaleString()} families</span>
-                    </div>
-                  </div>
-                  <motion.div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: stage.color }} whileHover={motionConfig.buttonHover}>
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-[var(--rose)] to-[var(--coral)] rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(stage.families / Math.max(funnelData[0]?.families ?? 1, 1)) * 100}%` }}
-                      transition={{ delay: 0.6 + idx * 0.1, duration: 1, ease: "easeOut" }}
-                    />
-                  </motion.div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="mumz-card rounded-3xl p-6 sm:p-8"
-            {...motionConfig.getReveal({ delay: 0.4, direction: "right", distance: 40 })}
-          >
-            <h2 className="text-xl text-[var(--deep-plum)] mb-2">Current vs Next Stage Mix</h2>
-            <p className="text-sm text-[var(--muted-mauve)] mb-6">Local family counts by current stage and predicted next stage</p>
-            <ResponsiveContainer width="100%" height={260}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis
-                  dataKey="stage"
-                  stroke="var(--muted-mauve)"
-                  tick={{ fontSize: 11 }}
-                  interval={0}
-                  angle={-18}
-                  textAnchor="end"
-                  height={56}
-                />
-                <YAxis allowDecimals={false} stroke="var(--muted-mauve)" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "white",
-                    border: "1px solid var(--border)",
-                    borderRadius: "12px",
-                    padding: "12px",
-                  }}
-                />
-                <Line type="monotone" dataKey="currentFamilies" name="Current families" stroke="var(--rose)" strokeWidth={3} dot={{ fill: "var(--rose)", r: 5 }} />
-                <Line type="monotone" dataKey="nextStageFamilies" name="Next stage families" stroke="var(--soft-teal)" strokeWidth={3} dot={{ fill: "var(--soft-teal)", r: 5 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </motion.div>
-        </div>
-
-        {/* At-Risk Family Table */}
-        <motion.div
-          className="mumz-card rounded-3xl p-6 sm:p-8"
-          {...motionConfig.getReveal({ delay: 0.6 })}
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+        <motion.section
+          className="mb-10"
+          {...motionConfig.getReveal({ direction: "down", duration: 0.55 })}
         >
-          <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--dusty-rose)] to-[var(--mist-lavender)] flex items-center justify-center">
-                <AlertCircle className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl text-[var(--deep-plum)]">At-Risk Families</h2>
-                <p className="text-sm text-[var(--muted-mauve)]">Using all local mock families with deterministic risk scoring</p>
-              </div>
-            </div>
-            <motion.button
-              className="mumz-subtle-button px-5 py-2 rounded-full text-[var(--deep-plum)] text-sm"
-              whileHover={motionConfig.buttonHover}
-              whileTap={motionConfig.gentleTap}
-            >
-              Export All
-            </motion.button>
+          <h1 className="text-[2.2rem] text-[var(--deep-plum)] sm:text-[2.8rem]">
+            Internal CRM Preview
+          </h1>
+          <p className="mt-3 text-base text-[var(--muted-mauve)] sm:text-lg">
+            A gentle overview of family stages and next opportunities.
+          </p>
+          <div className="mt-5 rounded-[1.5rem] border border-[rgba(42,18,18,0.08)] bg-white/88 px-5 py-4 shadow-[0_14px_30px_rgba(42,18,18,0.045)]">
+            <p className="text-sm leading-relaxed text-[var(--muted-mauve)]">
+              Demo view using fictional data. In production, this dashboard would be restricted to authorized internal teams.
+            </p>
           </div>
-          <div className="space-y-4 md:hidden">
-            {familyTableRows.map((entry, idx) => (
-              <motion.div
-                key={entry.family.id}
-                className="rounded-2xl border border-[var(--border)] bg-[var(--warm-ivory)] p-4"
-                {...motionConfig.getReveal({ delay: 0.7 + idx * 0.05, direction: "up", distance: 18, duration: 0.45 })}
-                whileHover={motionConfig.cardHoverSoft}
-              >
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm text-[var(--muted-mauve)]">{entry.family.id}</p>
-                    <p className="text-base text-[var(--deep-plum)]">
-                      {entry.family.parentName} &middot; {entry.family.babyName}
-                    </p>
-                  </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs ${
-                      entry.prediction.riskLevel === "High"
-                        ? "bg-[var(--rose)]/10 text-[var(--rose)]"
-                        : entry.prediction.riskLevel === "Medium"
-                          ? "bg-[var(--coral)]/10 text-[var(--coral)]"
-                          : "bg-[var(--soft-teal)]/10 text-[var(--soft-teal)]"
-                    }`}
-                  >
-                    {entry.prediction.riskLevel}
-                  </span>
-                </div>
 
-                <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                  <div>
-                    <p className="text-[var(--muted-mauve)]">Predicted stage</p>
-                    <p className="text-[var(--deep-plum)]">{entry.prediction.nextStage}</p>
-                  </div>
-                  <div>
-                    <p className="text-[var(--muted-mauve)]">Last key purchase</p>
-                    <p className="text-[var(--deep-plum)]">{entry.lastPurchase}</p>
-                  </div>
-                  <div>
-                    <p className="text-[var(--muted-mauve)]">Days silent</p>
-                    <p className="text-[var(--deep-plum)]">{entry.family.daysSilent}</p>
-                  </div>
-                  <div>
-                    <p className="text-[var(--muted-mauve)]">Next best action</p>
-                    <p className="text-[var(--soft-teal)]">{entry.prediction.nextBestAction}</p>
-                  </div>
-                </div>
-              </motion.div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {["Local demo data", "Rule-based stage logic", "Template journeys", "Admin/internal concept"].map((chip) => (
+              <span
+                key={chip}
+                className="rounded-full bg-[rgba(255,251,247,0.92)] px-4 py-2 text-sm text-[var(--deep-plum)] shadow-[0_10px_22px_rgba(42,18,18,0.04)]"
+              >
+                {chip}
+              </span>
             ))}
           </div>
-          <div className="hidden md:block">
-            <table className="w-full table-fixed">
-              <thead>
-                <tr className="border-b border-[var(--border)]">
-                  <th className="text-left py-3 px-4 text-sm text-[var(--muted-mauve)]">Parent ID</th>
-                  <th className="text-left py-3 px-4 text-sm text-[var(--muted-mauve)]">Baby</th>
-                  <th className="text-left py-3 px-4 text-sm text-[var(--muted-mauve)]">Predicted Stage</th>
-                  <th className="text-left py-3 px-4 text-sm text-[var(--muted-mauve)]">Last Key Purchase</th>
-                  <th className="text-left py-3 px-4 text-sm text-[var(--muted-mauve)]">Days Silent</th>
-                  <th className="text-left py-3 px-4 text-sm text-[var(--muted-mauve)]">Next Best Action</th>
-                  <th className="text-left py-3 px-4 text-sm text-[var(--muted-mauve)]">Risk Level</th>
-                </tr>
-              </thead>
-              <tbody>
-                {familyTableRows.map((entry, idx) => (
-                  <motion.tr
-                    key={entry.family.id}
-                    className="border-b border-[var(--border)] hover:bg-[var(--blush-pink)]/20 cursor-pointer"
-                    {...motionConfig.getReveal({ delay: 0.7 + idx * 0.05, direction: "left", distance: 20, duration: 0.45 })}
-                    whileHover={motionConfig.prefersReducedMotion ? undefined : { x: 4 }}
-                  >
-                    <td className="py-4 px-4 text-sm text-[var(--deep-plum)]">{entry.family.id}</td>
-                    <td className="py-4 px-4 text-sm text-[var(--deep-plum)]">
-                      <div>{entry.family.babyName}</div>
-                      <div className="text-xs text-[var(--muted-mauve)]">{entry.family.parentName}</div>
-                    </td>
-                    <td className="py-4 px-4 text-sm text-[var(--deep-plum)]">{entry.prediction.nextStage}</td>
-                    <td className="py-4 px-4 text-sm text-[var(--muted-mauve)]">{entry.lastPurchase}</td>
-                    <td className="py-4 px-4 text-sm text-[var(--deep-plum)]">{entry.family.daysSilent}</td>
-                    <td className="py-4 px-4 text-sm text-[var(--soft-teal)]">{entry.prediction.nextBestAction}</td>
-                    <td className="py-4 px-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs ${
-                          entry.prediction.riskLevel === "High"
-                            ? "bg-[var(--rose)]/10 text-[var(--rose)]"
-                            : entry.prediction.riskLevel === "Medium"
-                              ? "bg-[var(--coral)]/10 text-[var(--coral)]"
-                              : "bg-[var(--soft-teal)]/10 text-[var(--soft-teal)]"
-                        }`}
-                      >
-                        {entry.prediction.riskLevel}
-                      </span>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
 
-        {/* Template-Based Journey Generator */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <motion.div
-            className="rounded-3xl border border-[rgba(165,13,37,0.08)] bg-[linear-gradient(160deg,rgba(255,248,245,0.98),rgba(244,178,176,0.34))] p-6 sm:p-8"
-            {...motionConfig.getReveal({ delay: 0.8 })}
+          <button
+            type="button"
+            className="mt-5 text-sm text-[var(--deep-berry)] underline decoration-[rgba(143,16,37,0.24)] underline-offset-4"
+            onClick={() => onNavigate("landing")}
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-[var(--rose)]" />
+            Return to the landing page
+          </button>
+
+          {actionMessage ? (
+            <p className="mt-5 inline-flex rounded-full border border-[rgba(42,18,18,0.08)] bg-white/90 px-4 py-2 text-sm text-[var(--muted-mauve)]">
+              {actionMessage}
+            </p>
+          ) : null}
+        </motion.section>
+
+        <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {[
+            {
+              label: "Families tracked",
+              value: totalFamilies.toString(),
+              note: "Fictional families in the local demo",
+              icon: Users,
+              tint: "bg-[rgba(248,216,213,0.48)]",
+            },
+            {
+              label: "Starting solids soon",
+              value: startingSolidsSoon.toString(),
+              note: "Families nearing the next mealtime chapter",
+              icon: Sparkles,
+              tint: "bg-[rgba(255,251,247,0.92)]",
+            },
+            {
+              label: "At-risk families",
+              value: atRiskFamilies.length.toString(),
+              note: "Families that may need a gentle reminder",
+              icon: BellRing,
+              tint: "bg-[rgba(243,230,220,0.78)]",
+            },
+            {
+              label: "Journeys prepared",
+              value: templateJourneysPrepared.toString(),
+              note: "English-only lifecycle templates available",
+              icon: FileText,
+              tint: "bg-[rgba(221,239,229,0.74)]",
+            },
+          ].map((metric, index) => (
+            <motion.article
+              key={metric.label}
+              className="mumz-card rounded-[1.9rem] p-6"
+              {...motionConfig.getReveal({ delay: 0.08 * index, duration: 0.45 })}
+              whileHover={motionConfig.cardHoverSoft}
+            >
+              <div className={`flex h-12 w-12 items-center justify-center rounded-[1rem] ${metric.tint}`}>
+                <metric.icon className="h-5 w-5 text-[var(--deep-berry)]" />
               </div>
-              <h2 className="text-xl text-[var(--deep-plum)]">Template-Based Journey Generator</h2>
+              <p className="mt-5 text-sm text-[var(--muted-mauve)]">{metric.label}</p>
+              <p className="mt-2 text-[2rem] text-[var(--deep-plum)]">{metric.value}</p>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted-mauve)]">{metric.note}</p>
+            </motion.article>
+          ))}
+        </section>
+
+        <div className="mt-10 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+          <motion.section
+            className="mumz-card rounded-[2rem] p-6 sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.22, duration: 0.5 })}
+          >
+            <div className="mb-6">
+              <h2 className="text-[1.45rem] text-[var(--deep-plum)]">Family stage distribution</h2>
+              <p className="mt-2 text-sm text-[var(--muted-mauve)]">
+                Current and near-next stage mix across the fictional family set.
+              </p>
             </div>
+
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={stageDistributionData} barCategoryGap={22}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(42,18,18,0.07)" vertical={false} />
+                <XAxis dataKey="stage" tick={{ fontSize: 11, fill: "#7A5C58" }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#7A5C58" }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  cursor={{ fill: "rgba(248,216,213,0.18)" }}
+                  contentStyle={{
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid rgba(42,18,18,0.08)",
+                    borderRadius: "16px",
+                    color: "#2A1212",
+                  }}
+                />
+                <Bar dataKey="families" radius={[10, 10, 0, 0]}>
+                  {stageDistributionData.map((entry, index) => (
+                    <Cell key={`${entry.stage}-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.section>
+
+          <motion.section
+            className="rounded-[2rem] border border-[rgba(42,18,18,0.08)] bg-[linear-gradient(180deg,rgba(255,251,247,0.98),rgba(248,216,213,0.22))] p-6 shadow-[0_18px_40px_rgba(42,18,18,0.05)] sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.28, duration: 0.5 })}
+          >
+            <div className="mb-6">
+              <h2 className="text-[1.45rem] text-[var(--deep-plum)]">Next stage opportunities</h2>
+              <p className="mt-2 text-sm text-[var(--muted-mauve)]">
+                A gentle way to see which transitions may be coming soon.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {[
+                {
+                  title: "Starting solids soon",
+                  count: startingSolidsSoon,
+                  note: "Families moving from early feeding patterns toward first meals.",
+                  action: "Prepare solids journey",
+                },
+                {
+                  title: "Crawling prep soon",
+                  count: crawlingPrepSoon,
+                  note: "Families showing signs of more movement and floor activity.",
+                  action: "Send crawling prep guide",
+                },
+                {
+                  title: "First shoes soon",
+                  count: firstShoesSoon,
+                  note: "Families nearing early standing and first-step moments.",
+                  action: "Prepare first shoes journey",
+                },
+              ].map((opportunity, index) => (
+                <motion.article
+                  key={opportunity.title}
+                  className="rounded-[1.5rem] border border-[rgba(42,18,18,0.08)] bg-white/88 p-5"
+                  {...motionConfig.getReveal({ delay: 0.32 + index * 0.08, direction: "left", distance: 16, duration: 0.4 })}
+                  whileHover={motionConfig.cardHoverSoft}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-sm text-[var(--muted-mauve)]">{opportunity.title}</p>
+                      <p className="mt-2 text-[1.7rem] text-[var(--deep-plum)]">{opportunity.count}</p>
+                    </div>
+                    <span className="rounded-full bg-[rgba(248,216,213,0.5)] px-3 py-1 text-xs text-[var(--deep-berry)]">
+                      {opportunity.action}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-[var(--muted-mauve)]">{opportunity.note}</p>
+                </motion.article>
+              ))}
+            </div>
+          </motion.section>
+        </div>
+
+        <div className="mt-10 grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
+          <motion.section
+            ref={gentleReminderRef}
+            className="mumz-card rounded-[2rem] p-6 sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.34, duration: 0.5 })}
+          >
+            <div className="mb-6">
+              <h2 className="text-[1.45rem] text-[var(--deep-plum)]">Families that may need a gentle reminder</h2>
+              <p className="mt-2 text-sm text-[var(--muted-mauve)]">
+                A softer internal view of families who may need timely follow-up.
+              </p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-[720px] w-full">
+                <thead>
+                  <tr className="border-b border-[rgba(42,18,18,0.08)] text-left">
+                    <th className="px-3 py-3 text-sm text-[var(--muted-mauve)]">Family</th>
+                    <th className="px-3 py-3 text-sm text-[var(--muted-mauve)]">Baby</th>
+                    <th className="px-3 py-3 text-sm text-[var(--muted-mauve)]">Current stage</th>
+                    <th className="px-3 py-3 text-sm text-[var(--muted-mauve)]">Days silent</th>
+                    <th className="px-3 py-3 text-sm text-[var(--muted-mauve)]">Risk level</th>
+                    <th className="px-3 py-3 text-sm text-[var(--muted-mauve)]">Next best action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {atRiskFamilies.map((entry, index) => (
+                    <motion.tr
+                      key={entry.family.id}
+                      className="border-b border-[rgba(42,18,18,0.06)]"
+                      {...motionConfig.getReveal({ delay: 0.38 + index * 0.05, direction: "up", distance: 12, duration: 0.35 })}
+                    >
+                      <td className="px-3 py-4 text-sm text-[var(--deep-plum)]">{entry.demoLabel}</td>
+                      <td className="px-3 py-4 text-sm text-[var(--deep-plum)]">{entry.family.babyName}</td>
+                      <td className="px-3 py-4 text-sm text-[var(--deep-plum)]">{entry.prediction.currentStage}</td>
+                      <td className="px-3 py-4 text-sm text-[var(--deep-plum)]">{entry.family.daysSilent}</td>
+                      <td className="px-3 py-4">
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs ${
+                            entry.prediction.riskLevel === "High"
+                              ? "bg-[rgba(201,47,75,0.12)] text-[var(--deep-berry)]"
+                              : "bg-[rgba(243,230,220,0.76)] text-[var(--soft-espresso)]"
+                          }`}
+                        >
+                          {entry.prediction.riskLevel}
+                        </span>
+                      </td>
+                      <td className="px-3 py-4 text-sm text-[var(--muted-mauve)]">{entry.prediction.nextBestAction}</td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.section>
+
+          <motion.section
+            className="mumz-card rounded-[2rem] p-6 sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.4, duration: 0.5 })}
+            whileHover={motionConfig.cardHoverSoft}
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[rgba(243,230,220,0.78)]">
+              <ShieldCheck className="h-5 w-5 text-[var(--deep-berry)]" />
+            </div>
+            <h2 className="mt-5 text-[1.45rem] text-[var(--deep-plum)]">Why this family may need attention</h2>
+            <p className="mt-2 text-sm text-[var(--muted-mauve)]">
+              A business-friendly summary from one fictional family example.
+            </p>
+
+            <div className="mt-6 space-y-3">
+              {[
+                ...explainabilityExample.prediction.explanationSignals.slice(0, 3),
+                explainabilityExample.family.daysSilent >= 7
+                  ? "Family has been inactive for several days"
+                  : "Recent activity still looks healthy",
+              ].map((signal) => (
+                <div
+                  key={signal}
+                  className="rounded-[1.3rem] bg-[rgba(255,251,247,0.92)] px-4 py-4"
+                >
+                  <p className="text-sm leading-relaxed text-[var(--muted-mauve)]">{signal}</p>
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        </div>
+
+        <div className="mt-10 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+          <motion.section
+            className="rounded-[2rem] border border-[rgba(42,18,18,0.08)] bg-[linear-gradient(180deg,rgba(255,251,247,0.98),rgba(248,216,213,0.22))] p-6 shadow-[0_18px_40px_rgba(42,18,18,0.05)] sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.46, duration: 0.5 })}
+          >
+            <div className="mb-6">
+              <h2 className="text-[1.45rem] text-[var(--deep-plum)]">Template journey preview</h2>
+              <p className="mt-2 text-sm text-[var(--muted-mauve)]">
+                Prepare a parent-friendly transition message.
+              </p>
+            </div>
+
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-[var(--muted-mauve)] mb-2 block">Baby Stage</label>
+                <label className="mb-2 block text-sm text-[var(--muted-mauve)]">Stage</label>
                 <select
-                  className="w-full px-4 py-3 rounded-2xl bg-white/90 border border-white/60 text-[var(--deep-plum)]"
+                  className="w-full rounded-[1.2rem] border border-[rgba(42,18,18,0.08)] bg-white/90 px-4 py-3 text-[var(--deep-plum)]"
                   value={selectedStage}
                   onChange={(event) => setSelectedStage(event.target.value as (typeof TEMPLATE_STAGE_OPTIONS)[number])}
                 >
@@ -503,11 +476,12 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
                   ))}
                 </select>
               </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="text-sm text-[var(--muted-mauve)] mb-2 block">Journey Tone</label>
+                  <label className="mb-2 block text-sm text-[var(--muted-mauve)]">Tone</label>
                   <select
-                    className="w-full px-4 py-3 rounded-2xl bg-white/90 border border-white/60 text-[var(--deep-plum)]"
+                    className="w-full rounded-[1.2rem] border border-[rgba(42,18,18,0.08)] bg-white/90 px-4 py-3 text-[var(--deep-plum)]"
                     value={selectedTone}
                     onChange={(event) => setSelectedTone(event.target.value as JourneyTone)}
                   >
@@ -517,9 +491,9 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm text-[var(--muted-mauve)] mb-2 block">Channel</label>
+                  <label className="mb-2 block text-sm text-[var(--muted-mauve)]">Channel</label>
                   <select
-                    className="w-full px-4 py-3 rounded-2xl bg-white/90 border border-white/60 text-[var(--deep-plum)]"
+                    className="w-full rounded-[1.2rem] border border-[rgba(42,18,18,0.08)] bg-white/90 px-4 py-3 text-[var(--deep-plum)]"
                     value={selectedChannel}
                     onChange={(event) => setSelectedChannel(event.target.value)}
                   >
@@ -529,26 +503,29 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
                   </select>
                 </div>
               </div>
+
               <motion.button
-                className="mumz-primary-button w-full rounded-full px-6 py-4 text-white"
+                type="button"
+                className="mumz-primary-button w-full rounded-full px-6 py-3.5 text-white"
                 whileHover={motionConfig.buttonHoverStrong}
                 whileTap={motionConfig.gentleTap}
-                onClick={handleGenerateJourney}
+                onClick={handlePrepareJourney}
                 disabled={isGenerating}
                 aria-busy={isGenerating}
               >
-                {isGenerating ? "Preparing Journey..." : "Generate Journey"}
+                {isGenerating ? "Preparing journey..." : "Prepare journey"}
               </motion.button>
             </div>
-          </motion.div>
+          </motion.section>
 
-          <motion.div
-            className="mumz-card rounded-3xl p-6 sm:p-8"
-            {...motionConfig.getReveal({ delay: 0.9 })}
+          <motion.section
+            className="mumz-card rounded-[2rem] p-6 sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.52, duration: 0.5 })}
           >
-            <h3 className="text-lg text-[var(--deep-plum)] mb-4">Template Preview</h3>
+            <h3 className="text-[1.3rem] text-[var(--deep-plum)]">Template preview</h3>
+
             {isGenerating ? (
-              <div className="space-y-3" role="status" aria-live="polite">
+              <div className="mt-5 space-y-3" role="status" aria-live="polite">
                 {LOADING_STEPS.map((step, index) => {
                   const isActive = index === loadingStepIndex;
                   const isComplete = index < loadingStepIndex;
@@ -556,98 +533,121 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
                   return (
                     <motion.div
                       key={step}
-                      className={`p-4 rounded-2xl border ${
+                      className={`rounded-[1.3rem] border px-4 py-4 ${
                         isActive
-                          ? "bg-[var(--blush-pink)]/30 border-[var(--rose)]/20"
+                          ? "border-[rgba(201,47,75,0.18)] bg-[rgba(248,216,213,0.36)]"
                           : isComplete
-                            ? "bg-[var(--soft-mint)]/20 border-[var(--soft-teal)]/20"
-                            : "bg-[var(--warm-ivory)] border-[var(--border)]"
+                            ? "border-[rgba(42,18,18,0.08)] bg-[rgba(221,239,229,0.52)]"
+                            : "border-[rgba(42,18,18,0.08)] bg-[rgba(255,251,247,0.92)]"
                       }`}
-                      {...motionConfig.getReveal({ direction: "up", distance: 8, duration: 0.35 })}
+                      {...motionConfig.getReveal({ direction: "up", distance: 8, duration: 0.3 })}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isComplete ? "bg-[var(--soft-teal)] text-white" : isActive ? "bg-[var(--rose)] text-white" : "bg-white text-[var(--muted-mauve)]"}`}>
-                          {isComplete ? "Done" : index + 1}
-                        </div>
-                        <p className="text-[var(--deep-plum)]">{step}</p>
-                      </div>
+                      <p className="text-sm text-[var(--deep-plum)]">{step}</p>
                     </motion.div>
                   );
                 })}
               </div>
             ) : generatedJourney ? (
-              <div className="space-y-4" aria-live="polite">
-                <div className="p-5 rounded-2xl bg-[var(--blush-pink)]/30 border border-[var(--border)]">
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <span className="text-xs text-[var(--muted-mauve)]">{generatedJourney.babyName}</span>
-                    <span className="text-xs text-[var(--muted-mauve)]">&middot;</span>
-                    <span className="text-xs text-[var(--muted-mauve)]">{generatedJourney.stage}</span>
-                    <span className="text-xs text-[var(--muted-mauve)]">&middot;</span>
-                    <span className="text-xs text-[var(--muted-mauve)]">{generatedJourney.channel}</span>
-                  </div>
-                  <p className="text-lg text-[var(--deep-plum)] mb-2">{generatedJourney.card.title}</p>
-                  <p className="text-[var(--deep-plum)] leading-relaxed">{generatedJourney.card.body}</p>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {generatedJourney.card.recommendedCategories.map((category) => (
-                      <span key={category} className="px-3 py-1 rounded-full bg-white/70 text-xs text-[var(--deep-plum)]">
-                        {category}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-sm text-[var(--rose)] mt-4">{generatedJourney.card.gentleCTA}</p>
+              <div className="mt-5 rounded-[1.6rem] border border-[rgba(42,18,18,0.08)] bg-[rgba(255,251,247,0.92)] p-5">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--muted-mauve)]">
+                  <span>{generatedJourney.babyName}</span>
+                  <span>&middot;</span>
+                  <span>{generatedJourney.stage}</span>
+                  <span>&middot;</span>
+                  <span>{generatedJourney.channel}</span>
                 </div>
+                <p className="mt-4 text-lg text-[var(--deep-plum)]">{generatedJourney.card.title}</p>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--muted-mauve)] sm:text-base">
+                  {generatedJourney.card.body}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {generatedJourney.card.recommendedCategories.map((category) => (
+                    <span
+                      key={category}
+                      className="rounded-full bg-white/92 px-3 py-1 text-xs text-[var(--deep-plum)]"
+                    >
+                      {category}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-4 text-sm text-[var(--deep-berry)]">{generatedJourney.card.gentleCTA}</p>
               </div>
             ) : (
-              <div className="mumz-empty-state rounded-2xl p-5" role="note">
-                <p className="mb-2 text-[var(--deep-plum)]">Choose a stage to preview the next journey.</p>
-                <p className="text-[var(--muted-mauve)] leading-relaxed">
-                  Select a stage, tone, and channel to prepare an English-only lifecycle template from local rules.
+              <div className="mumz-empty-state mt-5 rounded-[1.5rem] p-5">
+                <p className="text-[var(--deep-plum)]">Choose a stage to preview the next journey.</p>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--muted-mauve)]">
+                  This is a local English-only template preview based on fictional family data and rule-based stage logic.
                 </p>
               </div>
             )}
-          </motion.div>
+          </motion.section>
         </div>
 
-        {/* Explainability */}
-        <motion.div
-          className="mumz-card rounded-3xl p-6 sm:p-8"
-          {...motionConfig.getReveal({ delay: 1 })}
+        <motion.section
+          className="mt-10"
+          {...motionConfig.getReveal({ delay: 0.58, duration: 0.5 })}
         >
-          <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--soft-mint)] to-[var(--powder-blue)] flex items-center justify-center">
-                <Users className="w-5 h-5 text-[var(--soft-teal)]" />
-              </div>
-              <div>
-                <h2 className="text-xl text-[var(--deep-plum)]">Explainability / No AI API</h2>
-                <span className="text-sm text-[var(--muted-mauve)]">Example signals from {explainabilityExample.family.parentName} and {explainabilityExample.family.babyName}</span>
-              </div>
-            </div>
+          <div className="mb-6">
+            <h2 className="text-[1.45rem] text-[var(--deep-plum)]">What the team can do next</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            {explainabilityExample.prediction.explanationSignals.map((reason, idx) => (
-              <motion.div
-                key={reason}
-                className="flex items-start gap-3 p-4 rounded-2xl bg-[var(--blush-pink)]/20 border border-[var(--border)]"
-                {...motionConfig.getReveal({ delay: 1.1 + idx * 0.1, direction: "scale", scale: 0.95 })}
-                whileHover={motionConfig.buttonHover}
+
+          <div className="grid gap-5 lg:grid-cols-3">
+            {[
+              {
+                title: "Prepare solids journey",
+                body: "Set the journey preview to a first-solids transition message.",
+                action: "prepare-solids",
+              },
+              {
+                title: "Review families needing reminders",
+                body: "Jump back to the families list that may need follow-up.",
+                action: "review-reminders",
+              },
+              {
+                title: "Send gentle reactivation message",
+                body: "Prototype-only action for a future internal outreach workflow.",
+                action: "reactivation",
+              },
+            ].map((item, index) => (
+              <motion.article
+                key={item.title}
+                className="mumz-card-soft rounded-[1.8rem] p-6"
+                {...motionConfig.getReveal({ delay: 0.62 + index * 0.08, duration: 0.4 })}
+                whileHover={motionConfig.cardHoverSoft}
               >
-                <div className="w-6 h-6 rounded-full bg-[var(--rose)]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <ChevronRight className="w-4 h-4 text-[var(--rose)]" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[rgba(248,216,213,0.5)]">
+                  <ClipboardList className="h-5 w-5 text-[var(--deep-berry)]" />
                 </div>
-                <p className="text-sm text-[var(--deep-plum)]">{reason}</p>
-              </motion.div>
+                <h3 className="mt-5 text-[1.25rem] text-[var(--deep-plum)]">{item.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--muted-mauve)]">{item.body}</p>
+                <motion.button
+                  type="button"
+                  className="mumz-secondary-button mt-5 rounded-full px-5 py-3 text-[var(--deep-plum)]"
+                  whileHover={motionConfig.buttonHover}
+                  whileTap={motionConfig.gentleTap}
+                  onClick={() => {
+                    if (item.action === "prepare-solids") {
+                      setSelectedStage("Starting Solids");
+                      setSelectedTone("gentle");
+                      setActionMessage("The journey preview is set to Starting Solids.");
+                      return;
+                    }
+
+                    if (item.action === "review-reminders") {
+                      scrollToGentleReminderSection();
+                      setActionMessage("Scrolled to families that may need a gentle reminder.");
+                      return;
+                    }
+
+                    setActionMessage("Gentle reactivation sending is still a prototype-only action.");
+                  }}
+                >
+                  Open
+                </motion.button>
+              </motion.article>
             ))}
           </div>
-          <div className="rounded-2xl bg-[var(--warm-ivory)] border border-[var(--border)] p-5 space-y-3">
-            <p className="text-[var(--deep-plum)]">
-              This prototype uses local mock data, deterministic lifecycle rules, confidence scoring, and English-only journey templates. It does not call external AI APIs.
-            </p>
-            <p className="text-[var(--muted-mauve)]">
-              Arabic localization can be added later with verified translations.
-            </p>
-          </div>
-        </motion.div>
+        </motion.section>
       </div>
     </div>
   );

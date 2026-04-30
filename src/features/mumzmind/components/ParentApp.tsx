@@ -2,42 +2,29 @@
 
 import { motion } from "motion/react";
 import {
-  Home,
-  TrendingUp,
-  ShoppingBag,
+  ArrowRight,
   BookOpen,
-  User,
+  Clock3,
+  Edit3,
   Sparkles,
-  Calendar,
-  Heart,
-  Edit,
+  User,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState, type RefObject } from "react";
 
-import { PremiumBabyIcon, type PremiumBabyIconName } from "./PremiumBabyIcons";
 import familiesData from "../data/families.json";
 import { usePageMotion } from "../hooks/usePageMotion";
 import { generateJourneyCard } from "../lib/journey-templates";
 import { predictBabyStage } from "../lib/stage-engine";
 import type { FamilyProfile } from "../types";
+import { PremiumBabyIcon, type PremiumBabyIconName } from "./PremiumBabyIcons";
 
-const CATEGORY_VISUALS = [
-  { icon: "🥣", color: "var(--pale-peach)" },
-  { icon: "🥄", color: "var(--soft-mint)" },
-  { icon: "👕", color: "var(--blush-pink)" },
-  { icon: "🪑", color: "var(--mist-lavender)" },
-  { icon: "🍼", color: "var(--powder-blue)" },
-  { icon: "🧸", color: "var(--warm-sand)" },
-];
-
-const CATEGORY_PREMIUM_ICON_MAP: Record<string, PremiumBabyIconName> = {
+const ESSENTIAL_ICON_MAP: Record<string, PremiumBabyIconName> = {
   "Baby cereal": "cereal",
   "Soft spoons": "spoon",
   Bibs: "bib",
   "High chair": "chair",
   "Sippy cup": "cup",
   "Feeding bottle": "bottle",
-  "Size 3 diapers": "diaper",
   "Crawling toys": "teddy",
   "Play mat": "playmat",
   "Baby-proofing essentials": "safety",
@@ -46,11 +33,70 @@ const CATEGORY_PREMIUM_ICON_MAP: Record<string, PremiumBabyIconName> = {
   "Outdoor stroller accessories": "stroller",
 };
 
-const CATEGORY_FALLBACK_ICONS: PremiumBabyIconName[] = ["cereal", "spoon", "bib", "chair", "cup", "teddy"];
+const ESSENTIAL_NOTES: Record<string, string> = {
+  "Baby cereal": "Gentle first-food starter",
+  "Soft spoons": "Easier for tiny mouths",
+  Bibs: "Keeps first meals calmer",
+};
+
+const STAGE_ICON_MAP: Record<string, PremiumBabyIconName> = {
+  "Newborn Care": "newborn",
+  "Diaper Size 1": "diaper",
+  "Diaper Size 2": "diaper",
+  "Diaper Size 3": "diaper",
+  "Feeding Routine": "bottle",
+  "Starting Solids": "spoon",
+  "Sitting Support": "chair",
+  "Crawling Prep": "teddy",
+  "First Shoes": "shoe",
+  "Toddler Snacks": "cereal",
+};
+
+const LATER_STAGE_SEQUENCE = [
+  "Newborn Care",
+  "Diaper Size 1",
+  "Diaper Size 2",
+  "Diaper Size 3",
+  "Starting Solids",
+  "Crawling Prep",
+  "First Shoes",
+  "Toddler Snacks",
+] as const;
+
+const FALLBACK_SIGNALS = [
+  "Recent size 3 diaper purchase",
+  "Feeding routine is becoming more frequent",
+  "No solids essentials added yet",
+];
+
+function getWarmSignalLabel(confidence: number): string {
+  if (confidence >= 80) {
+    return "Strong signal";
+  }
+
+  if (confidence >= 65) {
+    return "Steady signal";
+  }
+
+  return "Gentle signal";
+}
+
+function getLaterStage(nextStage: string): string {
+  const stageIndex = LATER_STAGE_SEQUENCE.indexOf(nextStage as (typeof LATER_STAGE_SEQUENCE)[number]);
+
+  if (stageIndex === -1) {
+    return "Crawling Prep";
+  }
+
+  return LATER_STAGE_SEQUENCE[Math.min(stageIndex + 1, LATER_STAGE_SEQUENCE.length - 1)];
+}
 
 export default function ParentApp({ onNavigate }: { onNavigate: (screen: string) => void }) {
-  const [activeTab, setActiveTab] = useState("home");
   const motionConfig = usePageMotion();
+  const [actionMessage, setActionMessage] = useState("");
+  const [prepList, setPrepList] = useState<string[]>([]);
+  const essentialsRef = useRef<HTMLElement | null>(null);
+  const whyRef = useRef<HTMLElement | null>(null);
 
   const families = familiesData as FamilyProfile[];
   const family =
@@ -63,303 +109,366 @@ export default function ParentApp({ onNavigate }: { onNavigate: (screen: string)
     tone: "gentle",
   });
 
-  const categories = prediction.recommendedCategories.map((name, index) => ({
+  const essentials = prediction.recommendedCategories.slice(0, 3).map((name) => ({
     name,
-    iconName: CATEGORY_PREMIUM_ICON_MAP[name] ?? CATEGORY_FALLBACK_ICONS[index % CATEGORY_FALLBACK_ICONS.length],
-    color: CATEGORY_VISUALS[index % CATEGORY_VISUALS.length].color,
+    iconName: ESSENTIAL_ICON_MAP[name] ?? "newborn",
+    note: ESSENTIAL_NOTES[name] ?? "A helpful essential for this chapter",
   }));
+  const explanationSignals =
+    prediction.explanationSignals.length >= 3
+      ? prediction.explanationSignals.slice(0, 3)
+      : FALLBACK_SIGNALS;
+  const signalLabel = getWarmSignalLabel(prediction.confidence);
+  const laterStage = getLaterStage(prediction.nextStage);
 
-  const navItems = [
-    { id: "home", icon: Home, label: "Home" },
-    { id: "timeline", icon: TrendingUp, label: "Timeline" },
-    { id: "shop", icon: ShoppingBag, label: "Shop" },
-    { id: "guides", icon: BookOpen, label: "Guides" },
-    { id: "profile", icon: User, label: "Profile" },
-  ];
+  function scrollToSection(sectionRef: RefObject<HTMLElement | null>) {
+    sectionRef.current?.scrollIntoView({
+      behavior: motionConfig.prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  }
+
+  function handlePrototypeAction(message: string) {
+    setActionMessage(message);
+  }
+
+  function togglePrepItem(itemName: string) {
+    setPrepList((current) => {
+      const alreadyAdded = current.includes(itemName);
+      const next = alreadyAdded
+        ? current.filter((entry) => entry !== itemName)
+        : [...current, itemName];
+
+      setActionMessage(
+        alreadyAdded
+          ? `${itemName} was removed from your prep list.`
+          : `${itemName} was added to your prep list.`,
+      );
+
+      return next;
+    });
+  }
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-[var(--warm-ivory)] pb-24">
-      {/* Ambient Background */}
-      <div className="fixed inset-0 opacity-20 pointer-events-none">
+    <div className="min-h-screen overflow-x-clip bg-[var(--warm-ivory)]">
+      <div className="pointer-events-none fixed inset-0 opacity-70">
         <motion.div
-          className="absolute right-0 top-0 h-72 w-72 rounded-full sm:h-96 sm:w-96"
-          style={{ background: "radial-gradient(circle, rgba(244, 178, 176, 0.3), transparent)" }}
+          className="absolute -right-20 top-0 h-72 w-72 rounded-full sm:h-[28rem] sm:w-[28rem]"
+          style={{ background: "radial-gradient(circle, rgba(248,216,213,0.5), transparent 64%)" }}
           animate={motionConfig.floatAmbient}
-          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 8, repeat: Infinity }}
+          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 11, repeat: Infinity }}
         />
         <motion.div
-          className="absolute bottom-0 left-0 h-72 w-72 rounded-full sm:h-96 sm:w-96"
-          style={{ background: "radial-gradient(circle, rgba(222, 58, 87, 0.16), transparent)" }}
+          className="absolute -left-16 bottom-0 h-64 w-64 rounded-full sm:h-80 sm:w-80"
+          style={{ background: "radial-gradient(circle, rgba(243,230,220,0.72), transparent 62%)" }}
           animate={motionConfig.floatAmbient}
-          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 10, repeat: Infinity }}
+          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 13, repeat: Infinity }}
         />
       </div>
 
-      {/* Header */}
-      <motion.div
-        className="relative z-10 px-4 pb-6 pt-8 sm:px-6"
-        {...motionConfig.getReveal({ direction: "down", duration: 0.6 })}
-      >
-        <div className="mb-6 flex items-start justify-between gap-4">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-14 pt-8 sm:px-6 lg:px-8">
+        <motion.div
+          className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          {...motionConfig.getReveal({ direction: "down", duration: 0.55 })}
+        >
           <div>
-            <motion.h1
-              className="mb-1 text-2xl text-[var(--deep-plum)] sm:text-3xl"
-              {...motionConfig.getReveal({ delay: 0.2, duration: 0.5 })}
-            >
+            <h1 className="text-[2rem] text-[var(--deep-plum)] sm:text-[2.3rem]">
               Good morning, {family.parentName}
-            </motion.h1>
-            <motion.p
-              className="text-[var(--muted-mauve)]"
-              {...motionConfig.getReveal({ delay: 0.3, duration: 0.5 })}
+            </h1>
+            <p className="mt-2 text-base text-[var(--muted-mauve)] sm:text-lg">
+              {family.babyName}&rsquo;s next chapter is ready.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[rgba(42,18,18,0.08)] bg-white/88 px-4 py-3 text-sm shadow-[0_12px_28px_rgba(42,18,18,0.05)]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(201,47,75,0.12)]">
+                <PremiumBabyIcon name="newborn" className="h-5 w-5" />
+              </div>
+              <span className="text-[var(--deep-plum)]">{family.babyName}</span>
+              <span className="text-[var(--muted-mauve)]">&middot;</span>
+              <span className="text-[var(--muted-mauve)]">{prediction.predictedAgeMonths} months</span>
+              <span className="text-[var(--muted-mauve)]">&middot;</span>
+              <span className="rounded-full bg-[rgba(221,239,229,0.86)] px-3 py-1 text-[var(--soft-espresso)]">
+                {signalLabel}
+              </span>
+            </div>
+
+            <motion.button
+              type="button"
+              aria-label="Open parent profile"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(42,18,18,0.08)] bg-white/88 shadow-[0_12px_28px_rgba(42,18,18,0.05)]"
+              whileHover={motionConfig.iconButtonHover}
+              whileTap={motionConfig.iconTap}
+              onClick={() => handlePrototypeAction("Profile tools are still a prototype in this demo.")}
             >
-              MumzMind has prepared {family.babyName}&rsquo;s next chapter
-            </motion.p>
+              <User className="h-5 w-5 text-[var(--deep-plum)]" />
+            </motion.button>
           </div>
-          <motion.button
-            aria-label="Open parent profile"
-            className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-white/60 backdrop-blur-sm"
-            whileHover={motionConfig.iconButtonHover}
-            whileTap={motionConfig.iconTap}
+        </motion.div>
+
+        {actionMessage ? (
+          <motion.p
+            className="mb-6 inline-flex rounded-full border border-[rgba(42,18,18,0.08)] bg-white/90 px-4 py-2 text-sm text-[var(--muted-mauve)] shadow-[0_12px_26px_rgba(42,18,18,0.04)]"
+            role="status"
+            aria-live="polite"
+            {...motionConfig.getReveal({ direction: "up", distance: 12, duration: 0.35 })}
           >
-            <User className="w-5 h-5 text-[var(--deep-plum)]" />
-          </motion.button>
-        </div>
+            {actionMessage}
+          </motion.p>
+        ) : null}
 
-        {/* Baby Profile Chip */}
-        <motion.div
-          className="inline-flex flex-wrap items-center gap-3 px-5 py-3 rounded-full bg-white/80 backdrop-blur-md border border-[var(--border)] shadow-lg"
-          {...motionConfig.getReveal({ delay: 0.4, direction: "scale", scale: 0.94 })}
-          whileHover={motionConfig.buttonHover}
+        <motion.section
+          className="mumz-card overflow-hidden rounded-[2rem] p-6 sm:p-8 lg:p-10"
+          {...motionConfig.getReveal({ delay: 0.12, duration: 0.55 })}
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[var(--rose)] to-[var(--coral)]">
-            <PremiumBabyIcon name="newborn" className="h-6 w-6" />
-          </div>
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-[var(--deep-plum)]">{family.babyName}</span>
-            <span className="text-[var(--muted-mauve)]">&middot;</span>
-            <span className="text-[var(--muted-mauve)]">Predicted age: {prediction.predictedAgeMonths} months</span>
-            <span className="text-[var(--muted-mauve)]">&middot;</span>
-            <div className="flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-[var(--soft-teal)]" />
-              <span className="text-[var(--soft-teal)]">{prediction.confidence}% confidence</span>
-            </div>
-          </div>
-        </motion.div>
-      </motion.div>
-
-      {/* Main Content */}
-      <div className="relative z-10 space-y-6 px-4 sm:px-6">
-        {/* Main Next Chapter Card */}
-        <motion.div
-          className="mumz-card relative overflow-hidden rounded-3xl p-6 sm:p-8"
-          {...motionConfig.getReveal({ delay: 0.5 })}
-          whileHover={motionConfig.cardHover}
-        >
-          <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(244,178,176,0.42),transparent_62%)] opacity-80 sm:h-64 sm:w-64" />
-
-          <div className="relative z-10">
-            <div className="flex items-start justify-between mb-6 gap-4">
-              <div className="flex-1">
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <Sparkles className="w-5 h-5 text-[var(--rose)]" />
-                  <span className="text-sm text-[var(--rose)]">Your baby&rsquo;s next chapter</span>
-                  <span className="mumz-badge rounded-full px-3 py-1 text-xs text-[var(--deep-plum)]">
-                    Prepared with local lifecycle rules
-                  </span>
-                </div>
-                <h2 className="text-2xl text-[var(--deep-plum)] mb-3">{journeyCard.title}</h2>
-                <p className="text-[var(--muted-mauve)] leading-relaxed mb-4">{journeyCard.body}</p>
-                <div className="flex flex-wrap gap-3 text-sm">
-                  <span className="px-4 py-2 rounded-full bg-[var(--warm-ivory)] text-[var(--deep-plum)]">
-                    Current stage: {prediction.currentStage}
-                  </span>
-                  <span className="px-4 py-2 rounded-full bg-[var(--warm-ivory)] text-[var(--deep-plum)]">
-                    Next stage: {prediction.nextStage}
-                  </span>
-                  <span className="px-4 py-2 rounded-full bg-[var(--warm-ivory)] text-[var(--deep-plum)]">
-                    Window: {prediction.nextStageWindow}
-                  </span>
-                </div>
+          <div className="grid gap-8 lg:grid-cols-[1.2fr_0.9fr] lg:gap-10">
+            <div className="flex flex-col">
+              <div className="mb-5 inline-flex w-fit items-center gap-2 rounded-full bg-[rgba(248,216,213,0.55)] px-4 py-2 text-sm text-[var(--deep-berry)]">
+                <Sparkles className="h-4 w-4" />
+                <span>Your baby&rsquo;s next chapter</span>
               </div>
-            </div>
 
-            <div className="mb-8 grid grid-cols-2 gap-3 py-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
-              {categories.map((category, idx) => (
-                <motion.div
-                  key={category.name}
-                  className="flex flex-col items-center justify-center rounded-2xl border border-[var(--border)] p-4 sm:p-6"
-                  style={{ backgroundColor: category.color }}
-                  {...motionConfig.getReveal({ delay: 0.7 + idx * 0.1, direction: "scale", scale: 0.9 })}
-                  whileHover={motionConfig.cardHoverScale}
-                >
-                  <PremiumBabyIcon name={category.iconName} className="mb-2 h-10 w-10 sm:h-12 sm:w-12" />
-                  <span className="text-sm text-center text-[var(--deep-plum)]">{category.name}</span>
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <motion.button
-                className="mumz-primary-button flex-1 rounded-full px-6 py-3 text-white"
-                whileHover={motionConfig.buttonHoverStrong}
-                whileTap={motionConfig.gentleTap}
-                onClick={() => onNavigate("stage")}
-              >
-                Explore This Stage
-              </motion.button>
-              <motion.button
-                className="mumz-secondary-button rounded-full px-6 py-3 text-[var(--deep-plum)]"
-                whileHover={motionConfig.buttonHover}
-                whileTap={motionConfig.gentleTap}
-              >
-                {journeyCard.gentleCTA}
-              </motion.button>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Recommended Categories Card */}
-        <motion.div
-          className="mumz-card rounded-3xl p-6"
-          {...motionConfig.getReveal({ delay: 0.7 })}
-          whileHover={motionConfig.cardHoverSoft}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <Heart className="w-5 h-5 text-[var(--coral)]" />
-            <h3 className="text-lg text-[var(--deep-plum)]">Helpful essentials for {prediction.nextStage}</h3>
-          </div>
-          <div className="grid grid-cols-2 gap-3 pb-1 sm:grid-cols-3 lg:grid-cols-5">
-            {categories.map((category, idx) => (
-              <motion.div
-                key={category.name}
-                className="rounded-2xl border border-[var(--border)] px-4 py-3 text-center"
-                style={{ backgroundColor: category.color }}
-                {...motionConfig.getReveal({ delay: 0.8 + idx * 0.1, direction: "left", distance: 20 })}
-                whileHover={motionConfig.cardHoverScale}
-              >
-                <div className="mb-2 flex justify-center">
-                  <PremiumBabyIcon name={category.iconName} className="h-9 w-9" />
-                </div>
-                <p className="text-sm text-[var(--deep-plum)]">{category.name}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Next Best Action Card */}
-        <motion.div
-          className="rounded-3xl border border-[rgba(165,13,37,0.08)] bg-[linear-gradient(160deg,rgba(255,248,245,0.98),rgba(244,178,176,0.36))] p-6"
-          {...motionConfig.getReveal({ delay: 0.9 })}
-          whileHover={motionConfig.cardHoverSoft}
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
-              <Calendar className="w-6 h-6 text-[var(--coral)]" />
-            </div>
-            <div>
-              <h3 className="text-lg text-[var(--deep-plum)] mb-2">A calmer way to prepare</h3>
-              <p className="text-[var(--deep-plum)] mb-2">{prediction.nextBestAction}</p>
-              <p className="text-[var(--muted-mauve)]">
-                {prediction.nextStage} may be coming in the next {prediction.nextStageWindow}. You&rsquo;ll always be able to adjust this if it doesn&rsquo;t feel right.
+              <h2 className="max-w-2xl text-[2rem] leading-[1.08] text-[var(--deep-plum)] sm:text-[2.55rem]">
+                {journeyCard.title}
+              </h2>
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--muted-mauve)] sm:text-lg">
+                We noticed a few gentle signs from {family.babyName}&rsquo;s recent essentials. Here are helpful things to prepare.
               </p>
-            </div>
-          </div>
-        </motion.div>
 
-        {/* Why We Think This Card */}
-        <motion.div
-          className="mumz-card rounded-3xl p-6"
-          {...motionConfig.getReveal({ delay: 1.1 })}
-          whileHover={motionConfig.cardHoverSoft}
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--soft-mint)] to-[var(--powder-blue)] flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-[var(--soft-teal)]" />
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <motion.button
+                  type="button"
+                  className="mumz-primary-button rounded-full px-6 py-3.5 text-white"
+                  whileHover={motionConfig.buttonHoverStrong}
+                  whileTap={motionConfig.gentleTap}
+                  onClick={() => scrollToSection(essentialsRef)}
+                >
+                  View essentials
+                </motion.button>
+                <motion.button
+                  type="button"
+                  className="mumz-secondary-button rounded-full px-6 py-3.5 text-[var(--deep-plum)]"
+                  whileHover={motionConfig.buttonHover}
+                  whileTap={motionConfig.gentleTap}
+                  onClick={() => scrollToSection(whyRef)}
+                >
+                  Why this suggestion?
+                </motion.button>
+              </div>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-[1.5rem] border border-[rgba(42,18,18,0.08)] bg-[rgba(255,251,247,0.92)] px-4 py-4">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">Current</p>
+                  <p className="mt-1 text-sm text-[var(--deep-plum)]">{prediction.currentStage}</p>
                 </div>
-                <div>
-                  <h3 className="text-lg text-[var(--deep-plum)]">Why this may be the right time</h3>
-                  <p className="text-[var(--muted-mauve)]">Gentle signals based on {family.parentName} and {family.babyName}&rsquo;s recent shopping history</p>
+                <div className="rounded-[1.5rem] border border-[rgba(42,18,18,0.08)] bg-[rgba(255,251,247,0.92)] px-4 py-4">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">Next</p>
+                  <p className="mt-1 text-sm text-[var(--deep-plum)]">{prediction.nextStage}</p>
+                </div>
+                <div className="rounded-[1.5rem] border border-[rgba(42,18,18,0.08)] bg-[rgba(255,251,247,0.92)] px-4 py-4">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">Window</p>
+                  <p className="mt-1 text-sm text-[var(--deep-plum)]">{prediction.nextStageWindow}</p>
                 </div>
               </div>
-              <div className="space-y-3">
-                {prediction.explanationSignals.map((signal, index) => (
+            </div>
+
+            <div className="rounded-[2rem] border border-[rgba(42,18,18,0.08)] bg-[linear-gradient(180deg,rgba(255,251,247,0.96),rgba(243,230,220,0.82))] p-5 shadow-[0_18px_36px_rgba(42,18,18,0.04)] sm:p-6">
+              <div className="mb-5 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm text-[var(--muted-mauve)]">Stage transition</p>
+                  <p className="text-lg text-[var(--deep-plum)]">A calmer way to prepare</p>
+                </div>
+                <div className="rounded-full bg-white/80 px-3 py-1 text-xs text-[var(--deep-berry)]">
+                  {signalLabel}
+                </div>
+              </div>
+
+              <div className="relative space-y-4">
+                <div className="absolute left-6 top-10 bottom-10 border-l border-dashed border-[rgba(143,16,37,0.18)]" />
+
+                {[
+                  {
+                    label: "Current",
+                    stage: prediction.currentStage,
+                    iconName: STAGE_ICON_MAP[prediction.currentStage] ?? "diaper",
+                    accent: "bg-[rgba(243,230,220,0.84)]",
+                  },
+                  {
+                    label: "Next",
+                    stage: prediction.nextStage,
+                    iconName: STAGE_ICON_MAP[prediction.nextStage] ?? "spoon",
+                    accent: "bg-[rgba(248,216,213,0.78)]",
+                  },
+                  {
+                    label: "Later",
+                    stage: laterStage,
+                    iconName: STAGE_ICON_MAP[laterStage] ?? "teddy",
+                    accent: "bg-[rgba(255,251,247,0.92)]",
+                  },
+                ].map((entry, index) => (
                   <motion.div
-                    key={signal}
-                    className="flex items-start gap-3 rounded-2xl bg-[var(--warm-ivory)] px-4 py-3"
-                    {...motionConfig.getReveal({ delay: 1.15 + index * 0.08, direction: "left", distance: 20 })}
+                    key={entry.label}
+                    className={`relative flex items-center gap-4 rounded-[1.5rem] border border-[rgba(42,18,18,0.08)] px-4 py-4 shadow-[0_10px_24px_rgba(42,18,18,0.035)] ${
+                      entry.label === "Next"
+                        ? "bg-white ring-1 ring-[rgba(201,47,75,0.12)]"
+                        : "bg-[rgba(255,255,255,0.76)]"
+                    }`}
+                    {...motionConfig.getReveal({ delay: 0.18 + index * 0.08, direction: "left", distance: 18, duration: 0.45 })}
+                    whileHover={motionConfig.cardHoverSoft}
                   >
-                    <div className="mt-1 w-2 h-2 rounded-full bg-[var(--rose)]" />
-                    <p className="text-[var(--muted-mauve)]">{signal}</p>
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-[1rem] ${entry.accent}`}>
+                      <PremiumBabyIcon name={entry.iconName} className="h-7 w-7" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">{entry.label}</p>
+                      <p className="mt-1 text-[15px] text-[var(--deep-plum)]">{entry.stage}</p>
+                    </div>
+                    {entry.label === "Next" ? (
+                      <span className="rounded-full bg-[rgba(201,47,75,0.12)] px-3 py-1 text-xs text-[var(--deep-berry)]">
+                        Coming soon
+                      </span>
+                    ) : null}
                   </motion.div>
                 ))}
               </div>
             </div>
           </div>
-        </motion.div>
+        </motion.section>
 
-        {/* Correction Card */}
-        <motion.div
-          className="mumz-card rounded-3xl p-6"
-          {...motionConfig.getReveal({ delay: 1.3 })}
-          whileHover={motionConfig.cardHoverSoft}
+        <motion.section
+          ref={essentialsRef}
+          className="mt-8"
+          {...motionConfig.getReveal({ delay: 0.2, duration: 0.5 })}
         >
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
-              <Edit className="w-5 h-5 text-[var(--muted-mauve)] mt-0.5" />
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h3 className="text-[1.45rem] text-[var(--deep-plum)]">Helpful essentials</h3>
+              <p className="mt-1 text-[var(--muted-mauve)]">
+                A few gentle essentials for this stage.
+              </p>
+            </div>
+            <motion.button
+              type="button"
+              className="mumz-secondary-button w-full rounded-full px-5 py-3 text-[var(--deep-plum)] sm:w-auto"
+              whileHover={motionConfig.buttonHover}
+              whileTap={motionConfig.gentleTap}
+              onClick={() => onNavigate("stage")}
+            >
+              Explore all essentials
+            </motion.button>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-3">
+            {essentials.map((item, index) => {
+              const isAdded = prepList.includes(item.name);
+
+              return (
+                <motion.article
+                  key={item.name}
+                  className="mumz-card-soft rounded-[1.75rem] p-5 sm:p-6"
+                  {...motionConfig.getReveal({ delay: 0.24 + index * 0.08, direction: "up", distance: 18, duration: 0.45 })}
+                  whileHover={motionConfig.cardHoverSoft}
+                >
+                  <div className="mb-5 rounded-[1.4rem] bg-[linear-gradient(180deg,rgba(248,216,213,0.44),rgba(255,251,247,0.96))] p-5">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-white/82 shadow-[0_12px_24px_rgba(42,18,18,0.04)]">
+                      <PremiumBabyIcon name={item.iconName} className="h-8 w-8" />
+                    </div>
+                  </div>
+                  <h4 className="text-lg text-[var(--deep-plum)]">{item.name}</h4>
+                  <p className="mt-2 text-sm text-[var(--muted-mauve)]">{item.note}</p>
+                  <motion.button
+                    type="button"
+                    className="mt-5 text-sm text-[var(--deep-berry)] underline decoration-[rgba(143,16,37,0.24)] underline-offset-4"
+                    whileHover={motionConfig.buttonHover}
+                    whileTap={motionConfig.gentleTap}
+                    onClick={() => togglePrepItem(item.name)}
+                  >
+                    {isAdded ? "Added to prep list" : "Add to prep list"}
+                  </motion.button>
+                </motion.article>
+              );
+            })}
+          </div>
+        </motion.section>
+
+        <div className="mt-8 grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+          <motion.section
+            ref={whyRef}
+            className="mumz-card rounded-[2rem] p-6 sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.28, duration: 0.5 })}
+            whileHover={motionConfig.cardHoverSoft}
+          >
+            <div className="mb-5 flex items-start gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[rgba(248,216,213,0.6)]">
+                <BookOpen className="h-5 w-5 text-[var(--deep-berry)]" />
+              </div>
               <div>
-                <p className="text-[var(--deep-plum)] mb-1">This doesn&rsquo;t match my baby?</p>
-                <p className="text-[var(--muted-mauve)]">
-                  You&rsquo;re always in control. You can correct this stage anytime.
+                <h3 className="text-[1.35rem] text-[var(--deep-plum)]">Why this may be the right time</h3>
+                <p className="mt-1 text-sm text-[var(--muted-mauve)]">
+                  Three gentle clues from {family.babyName}&rsquo;s recent essentials.
                 </p>
               </div>
             </div>
+
+            <div className="space-y-3">
+              {explanationSignals.map((signal, index) => (
+                <motion.div
+                  key={signal}
+                  className="flex items-start gap-3 rounded-[1.4rem] bg-[rgba(255,251,247,0.92)] px-4 py-3"
+                  {...motionConfig.getReveal({ delay: 0.34 + index * 0.08, direction: "left", distance: 16, duration: 0.4 })}
+                >
+                  <div className="mt-1 h-2.5 w-2.5 rounded-full bg-[var(--rose)]" />
+                  <p className="text-sm text-[var(--muted-mauve)]">{signal}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
+
+          <motion.section
+            className="rounded-[2rem] border border-[rgba(42,18,18,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(243,230,220,0.84))] p-6 shadow-[0_18px_40px_rgba(42,18,18,0.05)] sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.36, duration: 0.5 })}
+            whileHover={motionConfig.cardHoverSoft}
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[rgba(201,47,75,0.1)]">
+              <Clock3 className="h-5 w-5 text-[var(--deep-berry)]" />
+            </div>
+            <h3 className="mt-5 text-[1.35rem] text-[var(--deep-plum)]">You&rsquo;re always in control</h3>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--muted-mauve)] sm:text-base">
+              Every baby grows differently. If this does not match {family.babyName}&rsquo;s stage, you can correct it anytime.
+            </p>
+            <p className="mt-4 text-sm text-[var(--muted-mauve)]">
+              A calmer way to prepare starts with a few simple essentials and one next step at a time.
+            </p>
             <motion.button
-              className="mumz-subtle-button w-full rounded-full px-5 py-2 text-sm text-[var(--deep-plum)] sm:w-auto"
+              type="button"
+              className="mumz-secondary-button mt-6 inline-flex items-center gap-2 rounded-full px-5 py-3 text-[var(--deep-plum)]"
               whileHover={motionConfig.buttonHover}
               whileTap={motionConfig.gentleTap}
+              onClick={() => handlePrototypeAction("Editing the baby stage is still a prototype action in this demo.")}
             >
-              Edit baby age
+              <Edit3 className="h-4 w-4" />
+              Edit baby stage
             </motion.button>
-          </div>
+          </motion.section>
+        </div>
+
+        <motion.div
+          className="mt-8 flex justify-start"
+          {...motionConfig.getReveal({ delay: 0.42, duration: 0.45 })}
+        >
+          <motion.button
+            type="button"
+            className="inline-flex items-center gap-2 text-sm text-[var(--deep-berry)]"
+            whileHover={motionConfig.buttonHover}
+            whileTap={motionConfig.gentleTap}
+            onClick={() => onNavigate("timeline")}
+          >
+            See the full baby timeline
+            <ArrowRight className="h-4 w-4" />
+          </motion.button>
         </motion.div>
       </div>
-
-      {/* Bottom Navigation */}
-      <motion.nav
-        className="fixed bottom-0 left-0 right-0 z-50 border-t border-[var(--border)] bg-white/80 px-3 py-3 backdrop-blur-xl sm:px-6 sm:py-4"
-        {...motionConfig.getReveal({ delay: 0.6 })}
-      >
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-1 sm:justify-around sm:gap-2">
-          {navItems.map((item) => (
-            <motion.button
-              key={item.id}
-              className={`flex min-w-0 flex-1 flex-col items-center gap-1 rounded-2xl px-2 py-2 transition-colors sm:flex-none sm:px-4 ${
-                activeTab === item.id ? "text-[var(--rose)]" : "text-[var(--muted-mauve)]"
-              }`}
-              onClick={() => {
-                setActiveTab(item.id);
-                if (item.id === "timeline") {
-                  onNavigate("timeline");
-                }
-              }}
-              whileHover={motionConfig.iconButtonHover}
-              whileTap={motionConfig.iconTap}
-            >
-              <item.icon className="w-6 h-6" />
-              <span className="text-[11px] sm:text-xs">{item.label}</span>
-              {activeTab === item.id && (
-                <motion.div
-                  className="w-1 h-1 rounded-full bg-[var(--rose)]"
-                  layoutId="activeTab"
-                  transition={{ type: "spring", duration: 0.5 }}
-                />
-              )}
-            </motion.button>
-          ))}
-        </div>
-      </motion.nav>
     </div>
   );
 }

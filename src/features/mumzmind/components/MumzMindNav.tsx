@@ -23,13 +23,13 @@ export default function MumzMindNav() {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="text-sm font-medium text-[var(--deep-plum)]">MumzMind</div>
-              <div className="text-xs text-[var(--muted-mauve)]">Prepared gently for growing families</div>
+              <div className="text-xs text-[var(--muted-mauve)]">A calm guide for each next chapter</div>
             </div>
 
             <div className="flex items-center gap-2 lg:hidden">
               <div className="rounded-full border border-[var(--blush-pink)]/60 bg-white/80 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--deep-berry)]">
-                Next Chapter
-              </div>
+            Next Chapter
+          </div>
               <StaggeredMenu
                 items={mobileMenuItems}
                 logo="MumzMind"
@@ -44,7 +44,7 @@ export default function MumzMindNav() {
           </div>
 
           <div className="hidden rounded-full border border-[var(--blush-pink)]/60 bg-white/80 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--deep-berry)] lg:inline-flex">
-            Local Rules Demo
+            Next Chapter
           </div>
 
           <div className="hidden min-w-0 flex-wrap items-center gap-2 lg:flex lg:flex-1 lg:justify-end">

@@ -1,68 +1,78 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowLeft, Sparkles, CheckCircle, Clock, TrendingUp, Edit3 } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 import familiesData from "../data/families.json";
 import stagesData from "../data/stages.json";
-import { PremiumBabyIcon, type PremiumBabyIconName } from "./PremiumBabyIcons";
 import { usePageMotion } from "../hooks/usePageMotion";
 import { predictBabyStage } from "../lib/stage-engine";
 import type { BabyStage, FamilyProfile } from "../types";
+import { PremiumBabyIcon, type PremiumBabyIconName } from "./PremiumBabyIcons";
 
-type TimelineStatus = "past" | "current" | "next" | "future";
-
-type TimelineStage = {
-  id: string;
-  name: string;
-  status: TimelineStatus;
-  timeframe: string;
-  confidence: number;
+type Milestone = {
+  month: number;
+  title: string;
+  description: string;
+  placeholderLabel: string;
   iconName: PremiumBabyIconName;
-  categories: string[];
-  color: string;
-  ageRangeMonths: string;
-  parentMessage: string;
-  signals: string[];
 };
 
-const STAGE_VISUALS: Record<string, { icon: string; color: string }> = {
-  "Newborn Care": { icon: "👶", color: "var(--soft-mint)" },
-  "Diaper Size 1": { icon: "🍼", color: "var(--powder-blue)" },
-  "Diaper Size 2": { icon: "🧸", color: "var(--pale-peach)" },
-  "Diaper Size 3": { icon: "🥛", color: "var(--blush-pink)" },
-  "Feeding Routine": { icon: "🍼", color: "var(--warm-sand)" },
-  "Starting Solids": { icon: "🥄", color: "var(--mist-lavender)" },
-  "Sitting Support": { icon: "🪑", color: "var(--warm-sand)" },
-  "Crawling Prep": { icon: "🧩", color: "var(--soft-mint)" },
-  "First Shoes": { icon: "👟", color: "var(--powder-blue)" },
-  "Toddler Snacks": { icon: "🍎", color: "var(--pale-peach)" },
-};
+const FIRST_YEAR_MILESTONES: Milestone[] = [
+  {
+    month: 0,
+    title: "Newborn",
+    description: "Getting to know the world with comfort and care.",
+    placeholderLabel: "Newborn image",
+    iconName: "newborn",
+  },
+  {
+    month: 2,
+    title: "Early Smiles",
+    description: "Smiling more and discovering familiar faces.",
+    placeholderLabel: "2-month image",
+    iconName: "newborn",
+  },
+  {
+    month: 4,
+    title: "Rolling & Reaching",
+    description: "More movement and reaching for favorite things.",
+    placeholderLabel: "4-month image",
+    iconName: "playmat",
+  },
+  {
+    month: 6,
+    title: "Sitting Up",
+    description: "Sitting with support and showing more personality.",
+    placeholderLabel: "6-month image",
+    iconName: "chair",
+  },
+  {
+    month: 8,
+    title: "Crawling & Exploring",
+    description: "Getting curious and exploring the world around them.",
+    placeholderLabel: "8-month image",
+    iconName: "teddy",
+  },
+  {
+    month: 12,
+    title: "First Steps",
+    description: "Walking with support and celebrating big milestones.",
+    placeholderLabel: "12-month image",
+    iconName: "shoe",
+  },
+];
 
-const STAGE_PREMIUM_ICON_MAP: Record<string, PremiumBabyIconName> = {
-  "Newborn Care": "newborn",
-  "Diaper Size 1": "diaper",
-  "Diaper Size 2": "diaper",
-  "Diaper Size 3": "diaper",
-  "Feeding Routine": "bottle",
-  "Starting Solids": "spoon",
-  "Sitting Support": "chair",
-  "Crawling Prep": "teddy",
-  "First Shoes": "shoe",
-  "Toddler Snacks": "cereal",
-};
+function formatWindow(windowText: string): string {
+  return windowText.replaceAll("-", "–");
+}
 
-function titleCaseCategory(category: string): string {
-  return category
-    .split(" ")
-    .map((word) => {
-      if (!word) {
-        return word;
-      }
-
-      return `${word[0].toUpperCase()}${word.slice(1)}`;
-    })
-    .join(" ");
+function getNearestMilestoneIndex(ageMonths: number): number {
+  return FIRST_YEAR_MILESTONES.reduce((bestIndex, milestone, index) => {
+    const bestDistance = Math.abs(FIRST_YEAR_MILESTONES[bestIndex].month - ageMonths);
+    const nextDistance = Math.abs(milestone.month - ageMonths);
+    return nextDistance < bestDistance ? index : bestIndex;
+  }, 0);
 }
 
 export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: string) => void }) {
@@ -73,341 +83,218 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
     families.find((entry) => entry.parentName === "Sara" && entry.babyName === "Omar") ??
     families[0];
   const prediction = predictBabyStage(family);
-  const stageMap = new Map(stageCatalog.map((stage) => [stage.name, stage]));
-
-  const pastStageNames = ["Newborn Care", "Diaper Size 1", "Diaper Size 2"];
-  const currentStageNames = [prediction.currentStage];
-
-  if (
-    prediction.currentStage !== "Feeding Routine" &&
-    prediction.predictedAgeMonths >= 4 &&
-    prediction.predictedAgeMonths <= 6 &&
-    stageMap.has("Feeding Routine")
-  ) {
-    currentStageNames.push("Feeding Routine");
-  }
-
-  const futureStageNames = [prediction.nextStage, ...prediction.nextThreeStages].filter(
-    (stageName, index, allNames) =>
-      !!stageName &&
-      !currentStageNames.includes(stageName) &&
-      !pastStageNames.includes(stageName) &&
-      allNames.indexOf(stageName) === index,
-  );
-
-  const orderedStageNames = [...pastStageNames, ...currentStageNames, ...futureStageNames].filter(
-    (stageName, index, allNames) => allNames.indexOf(stageName) === index,
-  );
-
-  const timelineStages: TimelineStage[] = orderedStageNames
-    .map((stageName, index) => {
-      const stage = stageMap.get(stageName);
-
-      if (!stage) {
-        return null;
-      }
-
-      let status: TimelineStatus = "future";
-
-      if (pastStageNames.includes(stageName)) {
-        status = "past";
-      } else if (stageName === prediction.currentStage || stageName === "Feeding Routine") {
-        status = "current";
-      } else if (stageName === prediction.nextStage) {
-        status = "next";
-      }
-
-      const confidence =
-        status === "current"
-          ? prediction.confidence
-          : status === "next"
-            ? Math.max(prediction.confidence - 2, 70)
-            : status === "past"
-              ? Math.max(prediction.confidence - 6 + index * 2, 82)
-              : Math.max(prediction.confidence - 10 - index, 65);
-
-      const timeframe =
-        status === "past"
-          ? `Completed · ${stage.ageRangeMonths} months`
-          : status === "current"
-            ? stageName === prediction.currentStage
-              ? `Current stage · ${stage.ageRangeMonths} months`
-              : `Relevant now · ${stage.ageRangeMonths} months`
-            : status === "next"
-              ? `Likely in ${prediction.nextStageWindow}`
-              : `Ahead · ${stage.ageRangeMonths} months`;
-
-      return {
-        id: stage.id,
-        name: stage.name,
-        status,
-        timeframe,
-        confidence,
-        iconName: STAGE_PREMIUM_ICON_MAP[stage.name] ?? "newborn",
-        color: STAGE_VISUALS[stage.name]?.color ?? "var(--warm-sand)",
-        categories: stage.recommendedCategories.map(titleCaseCategory),
-        ageRangeMonths: stage.ageRangeMonths,
-        parentMessage: stage.parentMessage,
-        signals: stage.signals,
-      };
-    })
-    .filter((stage): stage is TimelineStage => stage !== null);
+  const activeMilestoneIndex = getNearestMilestoneIndex(prediction.predictedAgeMonths);
+  const activeMilestone = FIRST_YEAR_MILESTONES[activeMilestoneIndex];
+  const currentStageInfo =
+    stageCatalog.find((stage) => stage.name === prediction.currentStage) ??
+    stageCatalog.find((stage) => stage.name === prediction.nextStage);
 
   return (
     <div className="min-h-screen overflow-x-clip bg-[var(--warm-ivory)]">
-      {/* Background */}
-      <div className="fixed inset-0 opacity-20 pointer-events-none">
+      <div className="pointer-events-none fixed inset-0 opacity-70">
         <motion.div
-          className="absolute inset-0"
-          style={{ background: "radial-gradient(at 50% 0%, rgba(244, 178, 176, 0.3), transparent)" }}
-          animate={motionConfig.prefersReducedMotion ? undefined : { opacity: [0.2, 0.4, 0.2] }}
-          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 8, repeat: Infinity }}
+          className="absolute left-0 top-0 h-80 w-80 rounded-full sm:h-[30rem] sm:w-[30rem]"
+          style={{ background: "radial-gradient(circle, rgba(248,216,213,0.46), transparent 64%)" }}
+          animate={motionConfig.floatAmbient}
+          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 12, repeat: Infinity }}
+        />
+        <motion.div
+          className="absolute bottom-0 right-0 h-72 w-72 rounded-full sm:h-[26rem] sm:w-[26rem]"
+          style={{ background: "radial-gradient(circle, rgba(243,230,220,0.72), transparent 62%)" }}
+          animate={motionConfig.floatAmbient}
+          transition={motionConfig.prefersReducedMotion ? undefined : { duration: 14, repeat: Infinity }}
         />
       </div>
 
-      {/* Header */}
-      <motion.div
-        className="relative z-10 border-b border-[var(--border)] bg-white/40 px-4 pb-6 pt-8 backdrop-blur-md sm:px-6"
-        {...motionConfig.getReveal({ direction: "down" })}
-      >
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-6 flex items-start gap-4">
-            <motion.button
-              aria-label="Back to parent feed"
-              className="w-10 h-10 rounded-full bg-white/60 border border-[var(--border)] flex items-center justify-center"
-              whileHover={motionConfig.iconButtonHover}
-              whileTap={motionConfig.iconTap}
-              onClick={() => onNavigate("parent")}
-            >
-              <ArrowLeft className="w-5 h-5 text-[var(--deep-plum)]" />
-            </motion.button>
-            <div>
-              <h1 className="text-2xl text-[var(--deep-plum)] sm:text-[2rem]">{family.babyName}&rsquo;s Growth Journey</h1>
-              <p className="text-[var(--muted-mauve)] text-sm">A gentle view of what may come next</p>
-            </div>
-          </div>
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+        <motion.section
+          className="mx-auto max-w-3xl text-center"
+          {...motionConfig.getReveal({ direction: "down", duration: 0.55 })}
+        >
+          <h1 className="text-[2.2rem] text-[var(--deep-plum)] sm:text-[2.95rem]">
+            {family.babyName}&rsquo;s First Year
+          </h1>
+          <p className="mt-3 text-base leading-relaxed text-[var(--muted-mauve)] sm:text-lg">
+            A beautiful journey of growth, discovery and endless firsts.
+          </p>
+        </motion.section>
 
-          {/* Current Stage Info */}
-          <motion.div
-            className="mumz-card rounded-2xl p-5"
-            {...motionConfig.getReveal({ delay: 0.2, direction: "scale", scale: 0.95 })}
-          >
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div>
-                <p className="text-sm text-[var(--muted-mauve)] mb-1">Current stage</p>
-                <p className="text-lg text-[var(--deep-plum)]">{prediction.currentStage}</p>
-              </div>
-              <div className="sm:text-center">
-                <p className="text-sm text-[var(--muted-mauve)] mb-1">Predicted age</p>
-                <p className="text-lg text-[var(--deep-plum)]">{prediction.predictedAgeMonths} months</p>
-              </div>
-              <div className="sm:text-right">
-                <p className="text-sm text-[var(--muted-mauve)] mb-1">Confidence</p>
-                <div className="flex items-center gap-2 sm:justify-end">
-                  <Sparkles className="w-4 h-4 text-[var(--soft-teal)]" />
-                  <p className="text-lg text-[var(--soft-teal)]">{prediction.confidence}%</p>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <span className="px-4 py-2 rounded-full bg-[var(--warm-ivory)] text-sm text-[var(--deep-plum)]">
-                Next: {prediction.nextStage}
-              </span>
-              <span className="px-4 py-2 rounded-full bg-[var(--warm-ivory)] text-sm text-[var(--deep-plum)]">
-                Window: {prediction.nextStageWindow}
-              </span>
-              <span className="mumz-badge rounded-full px-4 py-2 text-sm text-[var(--deep-plum)]">
-                Prepared from gentle lifecycle signals
-              </span>
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
+        <motion.section
+          className="mt-10 rounded-[2rem] border border-[rgba(42,18,18,0.07)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,251,247,0.95))] px-5 py-8 shadow-[0_18px_44px_rgba(42,18,18,0.05)] sm:px-8 sm:py-10"
+          {...motionConfig.getReveal({ delay: 0.12, duration: 0.55 })}
+        >
+          <div className="overflow-x-auto pb-2">
+            <div className="min-w-[980px]">
+              <div className="grid grid-cols-6 gap-5">
+                {FIRST_YEAR_MILESTONES.map((milestone, index) => {
+                  const isActive = index === activeMilestoneIndex;
+                  const isPast = milestone.month < activeMilestone.month;
 
-      {/* Timeline */}
-      <div className="relative z-10 mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
-        <div className="relative">
-          <div className="absolute bottom-0 left-5 top-0 w-0.5 bg-gradient-to-b from-[rgba(217,111,120,0.18)] via-[rgba(222,58,87,0.36)] to-transparent sm:left-8" />
-
-          <div className="space-y-8">
-            {timelineStages.map((stage, idx) => (
-              <motion.div
-                key={stage.id}
-                className="relative"
-                {...motionConfig.getReveal({ delay: 0.1 * idx, direction: "left", distance: 30, duration: 0.5 })}
-              >
-                <div className="flex items-start gap-4 sm:gap-6">
-                  <motion.div
-                    className={`relative flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-4 text-xl shadow-lg sm:h-16 sm:w-16 sm:text-2xl ${
-                      stage.status === "current"
-                        ? "border-[var(--rose)] bg-white"
-                        : stage.status === "past"
-                          ? "border-[var(--soft-teal)] bg-white"
-                          : "border-white bg-white/60"
-                    }`}
-                    style={{ backgroundColor: stage.status === "current" ? "white" : stage.color }}
-                    whileHover={motionConfig.prefersReducedMotion ? undefined : { scale: 1.08, rotate: 3 }}
-                    transition={{ type: "spring" }}
-                  >
-                    <PremiumBabyIcon
-                      name={stage.iconName}
-                      className="h-7 w-7 sm:h-9 sm:w-9"
-                    />
-                    {stage.status === "current" && (
-                      <motion.div
-                        className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br from-[var(--rose)] to-[var(--coral)] flex items-center justify-center"
-                        animate={motionConfig.pulse}
-                        transition={motionConfig.prefersReducedMotion ? undefined : { duration: 2, repeat: Infinity }}
+                  return (
+                    <motion.article
+                      key={milestone.month}
+                      className="flex flex-col items-center text-center"
+                      {...motionConfig.getReveal({ delay: 0.16 + index * 0.06, direction: "up", distance: 18, duration: 0.45 })}
+                    >
+                      <div
+                        className={`flex h-32 w-32 items-center justify-center rounded-[2rem] border px-4 py-4 shadow-[0_14px_32px_rgba(42,18,18,0.05)] ${
+                          isActive
+                            ? "border-[rgba(201,47,75,0.16)] bg-[linear-gradient(180deg,rgba(248,216,213,0.52),rgba(255,251,247,0.98))]"
+                            : "border-[rgba(42,18,18,0.07)] bg-[linear-gradient(180deg,rgba(255,251,247,0.96),rgba(243,230,220,0.72))]"
+                        }`}
                       >
-                        <TrendingUp className="w-3 h-3 text-white" />
-                      </motion.div>
-                    )}
-                    {stage.status === "past" && (
-                      <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-[var(--soft-teal)] flex items-center justify-center">
-                        <CheckCircle className="w-3 h-3 text-white" />
-                      </div>
-                    )}
-                  </motion.div>
-
-                  <motion.div
-                    className={`flex-1 rounded-2xl p-4 sm:p-6 ${
-                      stage.status === "current"
-                        ? "border-2 border-[rgba(165,13,37,0.12)] bg-[linear-gradient(160deg,rgba(255,255,255,0.98),rgba(244,178,176,0.24))] shadow-[0_20px_38px_rgba(37,0,0,0.08)]"
-                        : stage.status === "past"
-                          ? "border border-[var(--border)] bg-[rgba(255,252,251,0.9)] shadow-[0_12px_26px_rgba(37,0,0,0.05)]"
-                          : "border border-[var(--border)] bg-[rgba(255,255,255,0.56)]"
-                    }`}
-                    whileHover={motionConfig.cardHover}
-                  >
-                    <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div>
-                        <h3 className={`text-lg ${stage.status === "current" ? "text-[var(--rose)]" : "text-[var(--deep-plum)]"}`}>
-                          {stage.name}
-                        </h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Clock className={`w-4 h-4 ${stage.status === "current" ? "text-[var(--rose)]" : "text-[var(--muted-mauve)]"}`} />
-                          <span className={`text-sm ${stage.status === "current" ? "text-[var(--rose)]" : "text-[var(--muted-mauve)]"}`}>
-                            {stage.timeframe}
-                          </span>
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="flex h-14 w-14 items-center justify-center rounded-[1.1rem] bg-white/84 shadow-[0_10px_20px_rgba(42,18,18,0.04)]">
+                            <PremiumBabyIcon name={milestone.iconName} className="h-8 w-8" />
+                          </div>
+                          <span className="text-xs text-[var(--muted-mauve)]">{milestone.placeholderLabel}</span>
                         </div>
-                        <p className="text-xs text-[var(--muted-mauve)] mt-2">Age range: {stage.ageRangeMonths} months</p>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Sparkles className="w-4 h-4 text-[var(--soft-teal)]" />
-                        <span className="text-sm text-[var(--soft-teal)]">{stage.confidence}%</span>
-                      </div>
-                    </div>
 
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {stage.categories.map((category) => (
-                        <motion.span
-                          key={category}
-                          className={`px-3 py-1 rounded-full text-xs ${
-                            stage.status === "current"
-                              ? "bg-white/80 text-[var(--deep-plum)]"
-                              : "bg-white/60 text-[var(--muted-mauve)]"
+                      <div className="mt-5 min-h-[4.5rem] px-2">
+                        {isActive ? (
+                          <div className="rounded-[1.3rem] border border-[rgba(201,47,75,0.12)] bg-white/92 px-4 py-3 shadow-[0_12px_28px_rgba(42,18,18,0.04)]">
+                            <p className="text-sm text-[var(--deep-plum)]">
+                              {family.babyName} may be nearing {prediction.nextStage}
+                            </p>
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <div className="relative mt-1 flex w-full items-center justify-center px-2">
+                        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 border-t border-[rgba(42,18,18,0.12)]" />
+                        <div
+                          className={`relative z-10 flex h-12 w-12 items-center justify-center rounded-full border text-sm shadow-[0_10px_20px_rgba(42,18,18,0.04)] ${
+                            isActive
+                              ? "h-14 w-14 border-[rgba(143,16,37,0.18)] bg-[linear-gradient(180deg,rgba(201,47,75,0.98),rgba(143,16,37,0.96))] text-white ring-4 ring-[rgba(248,216,213,0.62)]"
+                              : isPast
+                                ? "border-[rgba(42,18,18,0.09)] bg-white text-[var(--deep-plum)]"
+                                : "border-[rgba(42,18,18,0.08)] bg-[rgba(255,251,247,0.98)] text-[var(--deep-plum)]"
                           }`}
-                          whileHover={motionConfig.buttonHover}
                         >
-                          {category}
-                        </motion.span>
-                      ))}
-                    </div>
+                          {milestone.month}
+                        </div>
+                      </div>
 
-                    <p className="text-sm text-[var(--muted-mauve)] leading-relaxed mb-3">{stage.parentMessage}</p>
-
-                    <div className="flex flex-wrap gap-2">
-                      {stage.signals.slice(0, 2).map((signal) => (
-                        <span
-                          key={signal}
-                          className="px-3 py-1 rounded-full text-xs bg-[var(--warm-ivory)] text-[var(--muted-mauve)]"
-                        >
-                          {signal}
-                        </span>
-                      ))}
-                    </div>
-
-                    {stage.status === "next" && (
-                      <motion.button
-                        className="mumz-primary-button mt-4 w-full rounded-full px-5 py-2 text-sm text-white sm:w-auto"
-                        whileHover={motionConfig.buttonHoverStrong}
-                        whileTap={motionConfig.gentleTap}
-                        onClick={() => onNavigate("stage")}
-                      >
-                        Prepare for this stage
-                      </motion.button>
-                    )}
-                  </motion.div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Explanation Panel */}
-      <motion.div
-        className="relative z-10 mx-auto max-w-4xl px-4 pb-12 sm:px-6"
-        {...motionConfig.getReveal({ delay: 0.8 })}
-      >
-        <div className="mumz-card rounded-3xl p-6 sm:p-8">
-          <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--soft-mint)] to-[var(--powder-blue)] flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-[var(--soft-teal)]" />
-              </div>
-              <div>
-                <h3 className="text-xl text-[var(--deep-plum)]">Why this may be the right time</h3>
-                <p className="text-sm text-[var(--muted-mauve)]">Gentle signals based on {family.parentName} and {family.babyName}&rsquo;s purchase history</p>
+                      <div className="mt-6 px-2">
+                        <p className="text-sm uppercase tracking-[0.14em] text-[var(--muted-mauve)]">
+                          {milestone.month} month
+                        </p>
+                        <h3 className="mt-3 text-[1.05rem] text-[var(--deep-plum)]">{milestone.title}</h3>
+                        <p className="mt-3 text-sm leading-relaxed text-[var(--muted-mauve)]">
+                          {milestone.description}
+                        </p>
+                      </div>
+                    </motion.article>
+                  );
+                })}
               </div>
             </div>
-            <span className="mumz-badge rounded-full px-3 py-1 text-xs text-[var(--deep-plum)]">
-              Local lifecycle rules
-            </span>
           </div>
+        </motion.section>
 
-          <div className="space-y-3 mb-6">
-            {prediction.explanationSignals.map((reason, idx) => (
-              <motion.div
-                key={reason}
-                className="flex items-start gap-3"
-                {...motionConfig.getReveal({ delay: 1 + idx * 0.1, direction: "left", distance: 20 })}
-              >
-                <div className="w-6 h-6 rounded-full bg-[var(--blush-pink)] flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <CheckCircle className="w-4 h-4 text-[var(--rose)]" />
-                </div>
-                <p className="text-[var(--muted-mauve)] leading-relaxed">{reason}</p>
-              </motion.div>
-            ))}
-          </div>
+        <div className="mt-10 grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+          <motion.section
+            className="mumz-card rounded-[2rem] p-6 sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.22, duration: 0.5 })}
+            whileHover={motionConfig.cardHoverSoft}
+          >
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[rgba(248,216,213,0.58)]">
+                <Sparkles className="h-5 w-5 text-[var(--deep-berry)]" />
+              </div>
+              <div>
+                <h3 className="text-[1.35rem] text-[var(--deep-plum)]">Current stage context</h3>
+                <p className="text-sm text-[var(--muted-mauve)]">
+                  A gentle view of what may come next.
+                </p>
+              </div>
+            </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-[1.35rem] bg-[rgba(255,251,247,0.92)] px-4 py-4">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">Current</p>
+                <p className="mt-1 text-sm text-[var(--deep-plum)]">{prediction.currentStage}</p>
+              </div>
+              <div className="rounded-[1.35rem] bg-[rgba(255,251,247,0.92)] px-4 py-4">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">Next</p>
+                <p className="mt-1 text-sm text-[var(--deep-plum)]">{prediction.nextStage}</p>
+              </div>
+              <div className="rounded-[1.35rem] bg-[rgba(255,251,247,0.92)] px-4 py-4">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">Window</p>
+                <p className="mt-1 text-sm text-[var(--deep-plum)]">{formatWindow(prediction.nextStageWindow)}</p>
+              </div>
+            </div>
+
+            {currentStageInfo ? (
+              <div className="mt-5 rounded-[1.35rem] bg-[rgba(243,230,220,0.62)] px-4 py-4">
+                <p className="text-sm leading-relaxed text-[var(--muted-mauve)]">
+                  {currentStageInfo.parentMessage}
+                </p>
+              </div>
+            ) : null}
+
             <motion.button
-              className="mumz-subtle-button flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[var(--deep-plum)]"
-              whileHover={motionConfig.buttonHover}
-              whileTap={motionConfig.gentleTap}
-            >
-              <Edit3 className="w-4 h-4" />
-              Correct baby age
-            </motion.button>
-            <motion.button
-              className="mumz-primary-button rounded-full px-6 py-3 text-white"
+              type="button"
+              className="mumz-primary-button mt-6 rounded-full px-6 py-3.5 text-white"
               whileHover={motionConfig.buttonHoverStrong}
               whileTap={motionConfig.gentleTap}
               onClick={() => onNavigate("stage")}
             >
-              Explore next chapter
+              See the next chapter
             </motion.button>
-            <motion.button
-              className="mumz-secondary-button rounded-full px-6 py-3 text-[var(--deep-plum)]"
-              whileHover={motionConfig.buttonHover}
-              whileTap={motionConfig.gentleTap}
-            >
-              See stage details
-            </motion.button>
-          </div>
+          </motion.section>
+
+          <motion.section
+            className="mumz-card rounded-[2rem] p-6 sm:p-7"
+            {...motionConfig.getReveal({ delay: 0.28, duration: 0.5 })}
+            whileHover={motionConfig.cardHoverSoft}
+          >
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[rgba(221,239,229,0.84)]">
+                <Sparkles className="h-5 w-5 text-[var(--soft-espresso)]" />
+              </div>
+              <div>
+                <h3 className="text-[1.35rem] text-[var(--deep-plum)]">Why this may be the right time</h3>
+                <p className="text-sm text-[var(--muted-mauve)]">
+                  A few gentle signals from {family.babyName}&rsquo;s recent journey.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {prediction.explanationSignals.slice(0, 3).map((reason, index) => (
+                <motion.div
+                  key={reason}
+                  className="rounded-[1.3rem] bg-[rgba(255,251,247,0.92)] px-4 py-4"
+                  {...motionConfig.getReveal({ delay: 0.34 + index * 0.08, direction: "left", distance: 14, duration: 0.4 })}
+                >
+                  <p className="text-sm leading-relaxed text-[var(--muted-mauve)]">{reason}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
         </div>
-      </motion.div>
+
+        <motion.div
+          className="mt-10 text-center"
+          {...motionConfig.getReveal({ delay: 0.36, duration: 0.45 })}
+        >
+          <p className="text-base text-[var(--muted-mauve)]">
+            Every baby grows at their own pace. Celebrate every little milestone.
+          </p>
+          <motion.button
+            type="button"
+            className="mt-5 inline-flex items-center gap-2 text-sm text-[var(--deep-berry)]"
+            whileHover={motionConfig.buttonHover}
+            whileTap={motionConfig.gentleTap}
+            onClick={() => onNavigate("parent")}
+          >
+            Back to the parent feed
+            <ArrowRight className="h-4 w-4" />
+          </motion.button>
+        </motion.div>
+      </div>
     </div>
   );
 }
