@@ -92,7 +92,7 @@ const STAGE_KITS: Record<string, {
   },
 };
 
-export default function HeroLanding({ onNavigate, initialView = "store" }: { onNavigate: (screen: string) => void, initialView?: "store" | "cart" }) {
+export default function HeroLanding({ onNavigate, initialView = "store" }: { onNavigate: (screen: string) => void, initialView?: "store" | "cart" | "extension" }) {
   const { cart, addToCart, decrementCart, clearCart, totalPrice, totalItems } = useCart();
   const [currentView, setCurrentView] = useState<"store" | "cart" | "extension">(initialView);
   const [isAdding, setIsAdding] = useState<number | null>(null);
