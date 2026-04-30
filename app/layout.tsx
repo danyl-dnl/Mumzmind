@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "MumzMind — Baby Stage Intelligence Engine",
   description: "Predictive baby stage intelligence prototype for proactive parenting.",
   icons: {
-    icon: "/favicon-transparent.svg",
+    icon: "/brand-logo.png",
   },
 };
 

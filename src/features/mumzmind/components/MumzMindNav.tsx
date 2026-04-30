@@ -17,11 +17,18 @@ export default function MumzMindNav() {
       <nav className="mx-auto max-w-7xl rounded-[2rem] border border-white/60 bg-white/60 px-5 py-3.5 shadow-[0_8px_32px_rgba(42,18,18,0.03)] backdrop-blur-2xl">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center justify-between gap-4">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-              <img src="/brand-logo.png" alt="MumzMind Logo" className="h-10 w-10 rounded-full shadow-sm object-cover" />
+            <Link href="/" className="flex items-center gap-3 group transition-opacity">
+              <div className="relative">
+                <div className="absolute -inset-1 rounded-full bg-[var(--deep-berry)]/5 opacity-0 group-hover:opacity-100 transition-opacity blur-sm" />
+                <img 
+                  src="/brand-logo.png" 
+                  alt="MumzMind Logo" 
+                  className="relative h-11 w-11 rounded-full shadow-sm object-cover border-2 border-white ring-1 ring-[rgba(42,18,18,0.05)] transition-transform group-hover:scale-105" 
+                />
+              </div>
               <span className="text-xl font-medium tracking-tight text-[var(--deep-plum)]">MumzMind</span>
               <span className="hidden h-5 w-[1px] bg-[rgba(42,18,18,0.1)] lg:block"></span>
-              <span className="hidden text-xs text-[var(--muted-mauve)] lg:block">A calm guide for each next chapter</span>
+              <span className="hidden text-xs text-[var(--muted-mauve)] lg:block font-light italic">A calm guide for each next chapter</span>
             </Link>
 
             <div className="flex items-center gap-2 lg:hidden">
