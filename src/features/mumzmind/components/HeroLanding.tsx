@@ -5,6 +5,7 @@ import { ArrowRight, Lock, ShoppingBag, Sparkles, CheckCircle2, Plus, Minus, Che
 import { useState, useEffect } from "react";
 import { PremiumBabyIcon, type PremiumBabyIconName } from "./PremiumBabyIcons";
 import { useCart } from "../CartContext";
+import ProductExpertise from "./ProductExpertise";
 
 const STORE_ITEMS = [
   { id: 1, name: "Premium Diapers Size 3", price: 24.99, iconName: "diaper" as PremiumBabyIconName, desc: "Ultra-absorbent for active babies" },
@@ -250,10 +251,10 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                   >
                     <div className="relative aspect-square w-full overflow-hidden rounded-[1.5rem] bg-[rgba(255,251,247,0.94)] mb-4">
                       {item.image ? (
-                        <img 
-                          src={item.image} 
-                          alt={item.name} 
-                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
                         <PremiumBabyIcon name={item.iconName} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -715,6 +716,8 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                       Note: This is a demo prediction based on cart items. Live AI integration is pending; accuracy may vary.
                     </p>
                   </div>
+
+                  <ProductExpertise />
 
                 </div>
               </div>

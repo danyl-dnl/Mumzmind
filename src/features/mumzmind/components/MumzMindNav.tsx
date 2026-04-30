@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { StaggeredMenu } from "@/components/ui/staggered-menu";
 
 import { mumzMindNavLinks } from "../routes";
-
 import { useCart } from "../CartContext";
 
 export default function MumzMindNav() {
@@ -26,9 +25,10 @@ export default function MumzMindNav() {
                   className="relative h-11 w-11 rounded-full shadow-sm object-cover border-2 border-white ring-1 ring-[rgba(42,18,18,0.05)] transition-transform group-hover:scale-105" 
                 />
               </div>
-              <span className="text-xl font-medium tracking-tight text-[var(--deep-plum)]">MumzMind</span>
-              <span className="hidden h-5 w-[1px] bg-[rgba(42,18,18,0.1)] lg:block"></span>
-              <span className="hidden text-xs text-[var(--muted-mauve)] lg:block font-light italic">A calm guide for each next chapter</span>
+              <div className="flex flex-col items-start">
+                <span className="text-xl font-bold tracking-tight text-[var(--deep-plum)]">MumzMind</span>
+                <span className="hidden text-[10px] text-[var(--muted-mauve)] lg:block font-black uppercase tracking-widest opacity-60">Intelligence</span>
+              </div>
             </Link>
 
             <div className="flex items-center gap-2 lg:hidden">
@@ -53,7 +53,7 @@ export default function MumzMindNav() {
           <div className="hidden min-w-0 items-center gap-1.5 lg:flex lg:flex-1 lg:justify-end">
             {mumzMindNavLinks.map((link) => {
               const isActive = pathname === link.href;
-              const label = link.label === "Cart" ? `Cart (${totalItems})` : link.label;
+              const label = link.label === "Cart" ? `${link.label} (${totalItems})` : link.label;
 
               return (
                 <Link

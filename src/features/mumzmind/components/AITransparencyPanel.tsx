@@ -43,16 +43,16 @@ const WORKFLOW_STEPS = [
 
 // ─── Maps cart item names to stage signals ────────────────────────────────────
 const KEYWORD_TO_SIGNAL: Record<string, { stage: string; signal: string }> = {
-  Diaper:    { stage: "Newborn",         signal: "Diaper usage pattern detected" },
-  Bottle:    { stage: "Feeding",         signal: "Feeding accessory identified" },
-  Spoon:     { stage: "Solids",          signal: "Weaning implement detected" },
-  Cereal:    { stage: "Solids",          signal: "Nutritional transition signal" },
-  Chair:     { stage: "Solids",          signal: "Seating milestone identified" },
-  Bib:       { stage: "Solids",          signal: "Protective gear signal detected" },
-  Bear:      { stage: "Mobility",        signal: "Developmental play signal" },
-  "Play Mat":{ stage: "Mobility",        signal: "Floor-time environment expansion" },
-  Shoes:     { stage: "Walking",         signal: "Ambulation milestone detected" },
-  Cup:       { stage: "Walking",         signal: "Independence signal identified" },
+  Diaper: { stage: "Newborn", signal: "Diaper usage pattern detected" },
+  Bottle: { stage: "Feeding", signal: "Feeding accessory identified" },
+  Spoon: { stage: "Solids", signal: "Weaning implement detected" },
+  Cereal: { stage: "Solids", signal: "Nutritional transition signal" },
+  Chair: { stage: "Solids", signal: "Seating milestone identified" },
+  Bib: { stage: "Solids", signal: "Protective gear signal detected" },
+  Bear: { stage: "Mobility", signal: "Developmental play signal" },
+  "Play Mat": { stage: "Mobility", signal: "Floor-time environment expansion" },
+  Shoes: { stage: "Walking", signal: "Ambulation milestone detected" },
+  Cup: { stage: "Walking", signal: "Independence signal identified" },
 };
 
 export default function AITransparencyPanel() {
@@ -73,13 +73,13 @@ export default function AITransparencyPanel() {
 
   const confidenceColor =
     confidence >= 75 ? "text-emerald-700" :
-    confidence >= 50 ? "text-amber-700" :
-    "text-[var(--muted-mauve)]";
+      confidence >= 50 ? "text-amber-700" :
+        "text-[var(--muted-mauve)]";
 
   const confidenceBarColor =
     confidence >= 75 ? "bg-emerald-600" :
-    confidence >= 50 ? "bg-amber-600" :
-    "bg-[var(--deep-berry)]";
+      confidence >= 50 ? "bg-amber-600" :
+        "bg-[var(--deep-berry)]";
 
   return (
     <>
@@ -164,15 +164,14 @@ export default function AITransparencyPanel() {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`relative pb-4 px-4 text-xs font-bold uppercase tracking-widest transition-all ${
-                      activeTab === tab
+                    className={`relative pb-4 px-4 text-xs font-bold uppercase tracking-widest transition-all ${activeTab === tab
                         ? "text-[var(--deep-plum)]"
                         : "text-[var(--muted-mauve)] hover:text-[var(--deep-plum)]"
-                    }`}
+                      }`}
                   >
                     {tab === "live" ? "System Feed" : "Architecture"}
                     {activeTab === tab && (
-                      <motion.div 
+                      <motion.div
                         layoutId="activeTab"
                         className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--deep-berry)]"
                       />
@@ -231,7 +230,7 @@ export default function AITransparencyPanel() {
                           </p>
                           {liveSignals.length > 0 && <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Validated</span>}
                         </div>
-                        
+
                         {liveSignals.length === 0 ? (
                           <div className="rounded-[2rem] border border-dashed border-[rgba(42,18,18,0.12)] p-10 text-center bg-white/40">
                             <p className="text-sm font-medium text-[var(--muted-mauve)]">No signals detected.</p>
@@ -311,7 +310,7 @@ export default function AITransparencyPanel() {
                                 </div>
                                 <p className="text-[12px] text-[var(--muted-mauve)] leading-relaxed font-medium">{step.description}</p>
                                 <div className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-[var(--deep-berry)] uppercase tracking-wide">
-                                  <ChevronRight className="h-3 w-3" /> 
+                                  <ChevronRight className="h-3 w-3" />
                                   <span>{step.detail}</span>
                                 </div>
                               </div>
