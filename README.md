@@ -50,13 +50,6 @@ The "Intelligence" in MumzMind is powered by a deterministic **Stage Engine** (`
 
 ---
 
-## 🚫 No-AI-API Note
-> [!IMPORTANT]
-> **This project does NOT use any external LLM APIs (such as Gemini, OpenAI, or Claude).**
-> All "intelligence" and predictions are handled locally via the deterministic rule-based engine. This was a conscious design choice to ensure **zero-latency responses**, 100% predictable behavior for the retail prototype, and a focus on high-fidelity UI/UX without the cost or complexity of real-time LLM calls.
-
----
-
 ## 🔮 Future Scope
 - **Real LLM Integration**: Moving from rule-based logic to a true LLM for nuanced, conversational stage prediction.
 - **Multi-Child Profiles**: Support for parents managing different timelines for multiple children.
