@@ -317,8 +317,8 @@ export default function ParentApp({ onNavigate }: { onNavigate: (screen: string)
                     {...motionConfig.getReveal({ delay: 0.18 + index * 0.08, direction: "left", distance: 18, duration: 0.45 })}
                     whileHover={motionConfig.cardHoverSoft}
                   >
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-[1rem] ${entry.accent}`}>
-                      <PremiumBabyIcon name={entry.iconName} className="h-7 w-7" />
+                    <div className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-[1rem] ${entry.accent} p-1 shadow-sm`}>
+                      <PremiumBabyIcon name={entry.iconName} className="h-full w-full rounded-[0.75rem]" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--muted-mauve)]">{entry.label}</p>
@@ -364,29 +364,27 @@ export default function ParentApp({ onNavigate }: { onNavigate: (screen: string)
               const isAdded = prepList.includes(item.name);
 
               return (
-                <motion.article
-                  key={item.name}
-                  className="mumz-card-soft rounded-[1.75rem] p-5 sm:p-6"
-                  {...motionConfig.getReveal({ delay: 0.24 + index * 0.08, direction: "up", distance: 18, duration: 0.45 })}
-                  whileHover={motionConfig.cardHoverSoft}
+              <motion.article
+                key={item.name}
+                className="mumz-card-soft rounded-[1.75rem] p-4 sm:p-5 flex flex-col"
+                {...motionConfig.getReveal({ delay: 0.24 + index * 0.08, direction: "up", distance: 18, duration: 0.45 })}
+                whileHover={motionConfig.cardHoverSoft}
+              >
+                <div className="mb-4 aspect-[4/3] w-full overflow-hidden rounded-[1.25rem] shadow-sm">
+                  <PremiumBabyIcon name={item.iconName} className="h-full w-full object-cover" />
+                </div>
+                <h4 className="text-lg text-[var(--deep-plum)] px-1">{item.name}</h4>
+                <p className="mt-1 text-sm text-[var(--muted-mauve)] px-1">{item.note}</p>
+                <motion.button
+                  type="button"
+                  className="mt-4 text-sm text-[var(--deep-berry)] underline decoration-[rgba(143,16,37,0.24)] underline-offset-4 self-start px-1"
+                  whileHover={motionConfig.buttonHover}
+                  whileTap={motionConfig.gentleTap}
+                  onClick={() => togglePrepItem(item.name)}
                 >
-                  <div className="mb-5 rounded-[1.4rem] bg-[linear-gradient(180deg,rgba(248,216,213,0.44),rgba(255,251,247,0.96))] p-5">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-white/82 shadow-[0_12px_24px_rgba(42,18,18,0.04)]">
-                      <PremiumBabyIcon name={item.iconName} className="h-8 w-8" />
-                    </div>
-                  </div>
-                  <h4 className="text-lg text-[var(--deep-plum)]">{item.name}</h4>
-                  <p className="mt-2 text-sm text-[var(--muted-mauve)]">{item.note}</p>
-                  <motion.button
-                    type="button"
-                    className="mt-5 text-sm text-[var(--deep-berry)] underline decoration-[rgba(143,16,37,0.24)] underline-offset-4"
-                    whileHover={motionConfig.buttonHover}
-                    whileTap={motionConfig.gentleTap}
-                    onClick={() => togglePrepItem(item.name)}
-                  >
-                    {isAdded ? "Added to prep list" : "Add to prep list"}
-                  </motion.button>
-                </motion.article>
+                  {isAdded ? "Added to prep list" : "Add to prep list"}
+                </motion.button>
+              </motion.article>
               );
             })}
           </div>

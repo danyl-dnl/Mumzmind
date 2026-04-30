@@ -271,17 +271,14 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
               <div className="flex h-full min-h-[18rem] flex-col justify-between rounded-[1.7rem] border border-[rgba(42,18,18,0.06)] bg-[rgba(255,255,255,0.72)] p-6">
                 <div className="flex items-center justify-between gap-3">
                   <span className="rounded-full bg-[rgba(248,216,213,0.55)] px-3 py-1 text-xs text-[var(--deep-berry)]">
-                    Stage image placeholder
+                    Stage Overview
                   </span>
                   <span className="text-xs text-[var(--muted-mauve)]">{signalLabel}</span>
                 </div>
 
-                <div className="flex flex-1 items-center justify-center">
-                  <div className="relative flex h-44 w-full max-w-[18rem] items-center justify-center rounded-[1.8rem] bg-[linear-gradient(180deg,rgba(248,216,213,0.42),rgba(255,251,247,0.96))]">
-                    <div className="absolute inset-x-6 bottom-8 h-3 rounded-full bg-[rgba(42,18,18,0.06)] blur-md" />
-                    <div className="flex h-24 w-24 items-center justify-center rounded-[1.5rem] bg-white/86 shadow-[0_16px_28px_rgba(42,18,18,0.06)]">
-                      <PremiumBabyIcon name="chair" className="h-14 w-14" />
-                    </div>
+                <div className="flex flex-1 items-center justify-center py-4">
+                  <div className="relative flex h-48 w-full max-w-[18rem] items-center justify-center rounded-[1.8rem] overflow-hidden shadow-[0_16px_28px_rgba(42,18,18,0.08)]">
+                    <img src="/images/premium_chair.png" alt="high chair" className="h-full w-full object-cover" />
                   </div>
                 </div>
 
@@ -320,17 +317,15 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
             {preparationCards.map((item, index) => (
               <motion.article
                 key={item.name}
-                className="mumz-card-soft rounded-[1.75rem] p-5 sm:p-6"
+                className="mumz-card-soft rounded-[1.75rem] p-4 sm:p-5 flex flex-col"
                 {...motionConfig.getReveal({ delay: 0.24 + index * 0.08, direction: "up", distance: 18, duration: 0.45 })}
                 whileHover={motionConfig.cardHoverSoft}
               >
-                <div className="mb-5 rounded-[1.35rem] bg-[linear-gradient(180deg,rgba(248,216,213,0.44),rgba(255,251,247,0.96))] p-5">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-white/82 shadow-[0_12px_24px_rgba(42,18,18,0.04)]">
-                    <PremiumBabyIcon name={item.iconName} className="h-8 w-8" />
-                  </div>
+                <div className="mb-4 aspect-[4/3] w-full overflow-hidden rounded-[1.25rem] shadow-sm">
+                  <PremiumBabyIcon name={item.iconName} className="h-full w-full object-cover" />
                 </div>
-                <h4 className="text-lg text-[var(--deep-plum)]">{item.name}</h4>
-                <p className="mt-2 text-sm text-[var(--muted-mauve)]">{item.note}</p>
+                <h4 className="text-lg text-[var(--deep-plum)] px-1">{item.name}</h4>
+                <p className="mt-1 text-sm text-[var(--muted-mauve)] px-1">{item.note}</p>
               </motion.article>
             ))}
           </div>
@@ -358,15 +353,15 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
                 return (
                   <motion.article
                     key={pick.title}
-                    className="rounded-[1.5rem] border border-[rgba(42,18,18,0.08)] bg-white/86 p-5"
+                    className="rounded-[1.5rem] border border-[rgba(42,18,18,0.08)] bg-white/86 p-4 flex flex-col"
                     {...motionConfig.getReveal({ delay: 0.34 + index * 0.08, direction: "left", distance: 16, duration: 0.4 })}
                     whileHover={motionConfig.cardHoverSoft}
                   >
-                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-[1rem] bg-[rgba(243,230,220,0.78)]">
-                      <PremiumBabyIcon name={pick.iconName} className="h-7 w-7" />
+                    <div className="mb-4 aspect-square w-full overflow-hidden rounded-[1rem] shadow-sm">
+                      <PremiumBabyIcon name={pick.iconName} className="h-full w-full object-cover" />
                     </div>
-                    <h4 className="text-base text-[var(--deep-plum)]">{pick.title}</h4>
-                    <p className="mt-2 text-sm text-[var(--muted-mauve)]">{pick.reason}</p>
+                    <h4 className="text-base text-[var(--deep-plum)] px-1">{pick.title}</h4>
+                    <p className="mt-2 text-sm text-[var(--muted-mauve)] px-1">{pick.reason}</p>
                     <motion.button
                       type="button"
                       className="mt-4 text-sm text-[var(--deep-berry)] underline decoration-[rgba(143,16,37,0.24)] underline-offset-4"

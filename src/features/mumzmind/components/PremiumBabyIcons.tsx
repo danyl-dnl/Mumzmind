@@ -72,26 +72,11 @@ export function PremiumBabyIcon({ name, className }: PremiumBabyIconProps) {
       );
     case "spoon":
       return (
-        <SvgBase className={className}>
-          <ellipse cx="23.5" cy="23" rx="8.5" ry="10.5" fill="#FFE9E4" stroke="#A50D25" strokeWidth="2.2" />
-          <path d="M29.5 29.5L47 47" stroke="#A50D25" strokeWidth="5.2" strokeLinecap="round" />
-          <path d="M43 43L50 50" stroke="#DE3A57" strokeWidth="5.2" strokeLinecap="round" />
-          <path d="M19 20C20.8 18 22.7 17 24.6 17C27.1 17 29.2 18.4 30.4 20.5" stroke="#FFF8F5" strokeWidth="2.2" strokeLinecap="round" />
-        </SvgBase>
+        <img src="/images/premium_spoon.png" alt="spoon" className={className} style={{ objectFit: "cover", borderRadius: "10%" }} />
       );
     case "teddy":
       return (
-        <SvgBase className={className}>
-          <circle cx="20" cy="20" r="8" fill="#F4B2B0" />
-          <circle cx="44" cy="20" r="8" fill="#F4B2B0" />
-          <circle cx="32" cy="31" r="17" fill="#FFE9E4" />
-          <circle cx="32" cy="31" r="17" stroke="#A50D25" strokeWidth="2.2" />
-          <circle cx="25.5" cy="29.5" r="1.8" fill="#250000" />
-          <circle cx="38.5" cy="29.5" r="1.8" fill="#250000" />
-          <ellipse cx="32" cy="36.2" rx="5.8" ry="4.6" fill="#FFF8F5" stroke="#A50D25" strokeWidth="1.8" />
-          <path d="M29.5 37.4C31.1 39 32.9 39 34.5 37.4" stroke="#A50D25" strokeWidth="1.8" strokeLinecap="round" />
-          <circle cx="32" cy="34.8" r="1.7" fill="#A50D25" />
-        </SvgBase>
+        <img src="/images/premium_teddy.png" alt="teddy" className={className} style={{ objectFit: "cover", borderRadius: "10%" }} />
       );
     case "shoe":
       return (
@@ -105,42 +90,19 @@ export function PremiumBabyIcon({ name, className }: PremiumBabyIconProps) {
       );
     case "diaper":
       return (
-        <SvgBase className={className}>
-          <path d="M17 20L26 16H38L47 20L44.5 46C44.2 49.5 41.3 52 37.8 52H26.2C22.7 52 19.8 49.5 19.5 46L17 20Z" fill="#FFF8F5" stroke="#A50D25" strokeWidth="2.2" />
-          <path d="M17.8 25.5C21.1 25.5 23.9 28 24.3 31.3L25 36.2C25.4 39.4 28.1 41.8 31.4 41.8H32.6C35.9 41.8 38.6 39.4 39 36.2L39.7 31.3C40.1 28 42.9 25.5 46.2 25.5" stroke="#F4B2B0" strokeWidth="2.2" />
-          <path d="M22 17.8L24.7 23" stroke="#DE3A57" strokeWidth="2.2" strokeLinecap="round" />
-          <path d="M42 17.8L39.3 23" stroke="#DE3A57" strokeWidth="2.2" strokeLinecap="round" />
-        </SvgBase>
+        <img src="/images/premium_diaper.png" alt="diaper" className={className} style={{ objectFit: "cover", borderRadius: "10%" }} />
       );
     case "cereal":
       return (
-        <SvgBase className={className}>
-          <path d="M17 34C17 26.8 22.8 21 30 21H48C48 35.8 40.5 46 30.8 46H28.2C21.9 46 17 40.1 17 34Z" fill="#FFF8F5" stroke="#A50D25" strokeWidth="2.2" />
-          <path d="M20.5 28.5H43.5" stroke="#F4B2B0" strokeWidth="2.2" strokeLinecap="round" />
-          <circle cx="27" cy="31.5" r="2.3" fill="#DE3A57" fillOpacity="0.35" />
-          <circle cx="32.6" cy="34.5" r="2.3" fill="#DE3A57" fillOpacity="0.35" />
-          <circle cx="38.2" cy="31" r="2.3" fill="#DE3A57" fillOpacity="0.35" />
-          <path d="M46 17L52 11" stroke="#A50D25" strokeWidth="3.2" strokeLinecap="round" />
-          <ellipse cx="43.4" cy="19.4" rx="4.6" ry="3.4" transform="rotate(-42 43.4 19.4)" fill="#FFE9E4" stroke="#A50D25" strokeWidth="2" />
-        </SvgBase>
+        <img src="/images/premium_cereal.png" alt="cereal" className={className} style={{ objectFit: "cover", borderRadius: "10%" }} />
       );
     case "bib":
       return (
-        <SvgBase className={className}>
-          <path d="M22 17.5C22 12.8 25.8 9 30.5 9H33.5C38.2 9 42 12.8 42 17.5V23.3L46.5 31.7C47.8 34.1 46.1 37 43.4 37H40V46.3C40 49.4 37.4 52 34.3 52H29.7C26.6 52 24 49.4 24 46.3V37H20.6C17.9 37 16.2 34.1 17.5 31.7L22 23.3V17.5Z" fill="#FFF8F5" stroke="#A50D25" strokeWidth="2.2" />
-          <circle cx="32" cy="26" r="5" fill="#F4B2B0" fillOpacity="0.75" />
-          <path d="M27.8 14.5C28.5 13 29.9 12 31.5 12H32.5C34.1 12 35.5 13 36.2 14.5" stroke="#DE3A57" strokeWidth="2.2" strokeLinecap="round" />
-        </SvgBase>
+        <img src="/images/premium_bib.png" alt="bib" className={className} style={{ objectFit: "cover", borderRadius: "10%" }} />
       );
     case "chair":
       return (
-        <SvgBase className={className}>
-          <path d="M22 17H42V29C42 33.4 38.4 37 34 37H30C25.6 37 22 33.4 22 29V17Z" fill="#FFF8F5" stroke="#A50D25" strokeWidth="2.2" />
-          <path d="M25 37V48.5" stroke="#A50D25" strokeWidth="2.6" strokeLinecap="round" />
-          <path d="M39 37V48.5" stroke="#A50D25" strokeWidth="2.6" strokeLinecap="round" />
-          <path d="M22 24H42" stroke="#F4B2B0" strokeWidth="2.2" />
-          <path d="M20 49H44" stroke="#A50D25" strokeWidth="2.6" strokeLinecap="round" />
-        </SvgBase>
+        <img src="/images/premium_chair.png" alt="chair" className={className} style={{ objectFit: "cover", borderRadius: "10%" }} />
       );
     case "cup":
       return (
