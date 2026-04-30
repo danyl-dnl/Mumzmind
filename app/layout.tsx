@@ -13,8 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MumzMind",
-  description: "AI-powered baby stage intelligence demo for Mumzworld.",
+  title: "MumzMind — Baby Stage Intelligence Engine",
+  description: "Predictive baby stage intelligence prototype for proactive parenting.",
+  icons: {
+    icon: "/favicon-transparent.svg",
+  },
 };
 
 import { CartProvider } from "@/src/features/mumzmind/CartContext";
@@ -29,7 +32,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <CartProvider>{children}</CartProvider>
       </body>
     </html>

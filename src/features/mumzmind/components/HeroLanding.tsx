@@ -197,6 +197,7 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
               <div className="relative mb-8">
                 <div className="absolute inset-0 animate-ping rounded-full bg-[var(--deep-berry)]/20" />
                 <div className="relative rounded-full bg-white p-10 shadow-xl ring-1 ring-[rgba(42,18,18,0.05)]">
+                  <img src="/brand-logo.png" alt="MumzMind Logo" className="absolute -right-2 -top-2 h-16 w-16 rounded-full shadow-lg border-2 border-white object-cover" />
                   <CheckCircle className="h-20 w-20 text-[var(--deep-berry)]" />
                 </div>
               </div>
@@ -283,8 +284,8 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                               onClick={() => handleAddToCart(item)}
                               disabled={isAdding === item.id}
                               className={`flex h-10 w-10 items-center justify-center rounded-full shadow-sm transition-all ${isAdding === item.id
-                                  ? "bg-[rgba(221,239,229,0.84)] text-[var(--soft-espresso)]"
-                                  : "bg-[var(--deep-plum)] text-white hover:scale-110"
+                                ? "bg-[rgba(221,239,229,0.84)] text-[var(--soft-espresso)]"
+                                : "bg-[var(--deep-plum)] text-white hover:scale-110"
                                 }`}
                             >
                               {isAdding === item.id ? <CheckCircle2 className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
@@ -474,8 +475,8 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                                 </>
                               )}
                               <div className={`relative h-28 w-28 overflow-hidden rounded-full border-4 shadow-xl transition-all duration-700 ${isPredicted
-                                  ? "border-[var(--deep-berry)] scale-125 z-20 grayscale-0"
-                                  : "border-white opacity-30 grayscale z-10"
+                                ? "border-[var(--deep-berry)] scale-125 z-20 grayscale-0"
+                                : "border-white opacity-30 grayscale z-10"
                                 }`}>
                                 <img src={milestone.image} alt={milestone.title} className="h-full w-full object-cover" />
                               </div>

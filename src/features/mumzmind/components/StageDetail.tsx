@@ -77,7 +77,7 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
       </div>
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 pt-8 sm:px-6 lg:px-8 lg:pt-12">
-        
+
         {/* Navigation */}
         <button
           onClick={() => onNavigate("timeline")}
@@ -122,11 +122,10 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
               return (
                 <motion.div
                   key={product.name}
-                  className={`relative flex flex-col p-5 rounded-[1.5rem] border transition-all duration-300 ${
-                    isAdded
+                  className={`relative flex flex-col p-5 rounded-[1.5rem] border transition-all duration-300 ${isAdded
                       ? "bg-white border-[rgba(201,47,75,0.2)] shadow-[0_8px_20px_rgba(201,47,75,0.06)]"
                       : "bg-[rgba(255,251,247,0.8)] border-[rgba(42,18,18,0.05)] hover:shadow-md"
-                  }`}
+                    }`}
                   {...motionConfig.getReveal({ delay: 0.15 + index * 0.05, direction: "up", distance: 10 })}
                 >
                   <div className="flex items-center gap-4 mb-4">
@@ -143,11 +142,10 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
                   </p>
                   <button
                     onClick={() => toggleItem(product.name)}
-                    className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl font-medium transition-colors ${
-                      isAdded
+                    className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl font-medium transition-colors ${isAdded
                         ? "bg-[rgba(201,47,75,0.08)] text-[var(--deep-berry)]"
                         : "bg-[var(--deep-plum)] text-white hover:bg-[#2A1212]"
-                    }`}
+                      }`}
                   >
                     {isAdded ? (
                       <>
