@@ -136,9 +136,9 @@ export default function ParentApp({ onNavigate }: { onNavigate: (screen: string)
           </div>
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <span className="text-[var(--deep-plum)]">{family.babyName}</span>
-            <span className="text-[var(--muted-mauve)]">•</span>
+            <span className="text-[var(--muted-mauve)]">&middot;</span>
             <span className="text-[var(--muted-mauve)]">Predicted age: {prediction.predictedAgeMonths} months</span>
-            <span className="text-[var(--muted-mauve)]">•</span>
+            <span className="text-[var(--muted-mauve)]">&middot;</span>
             <div className="flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-[var(--soft-teal)]" />
               <span className="text-[var(--soft-teal)]">{prediction.confidence}% confidence</span>
@@ -155,16 +155,16 @@ export default function ParentApp({ onNavigate }: { onNavigate: (screen: string)
           {...motionConfig.getReveal({ delay: 0.5 })}
           whileHover={motionConfig.cardHover}
         >
-          <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-gradient-to-br from-[var(--blush-pink)] to-[var(--mist-lavender)] opacity-20 blur-3xl sm:h-64 sm:w-64" />
+          <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(244,178,176,0.42),transparent_62%)] opacity-80 sm:h-64 sm:w-64" />
 
           <div className="relative z-10">
             <div className="flex items-start justify-between mb-6 gap-4">
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <Sparkles className="w-5 h-5 text-[var(--rose)]" />
-                  <span className="text-sm text-[var(--rose)]">Next Chapter Prediction</span>
-                  <span className="px-3 py-1 rounded-full bg-[var(--blush-pink)]/50 text-xs text-[var(--deep-plum)]">
-                    Powered by local lifecycle rules — no AI API
+                  <span className="text-sm text-[var(--rose)]">Your baby&rsquo;s next chapter</span>
+                  <span className="mumz-badge rounded-full px-3 py-1 text-xs text-[var(--deep-plum)]">
+                    Prepared with local lifecycle rules
                   </span>
                 </div>
                 <h2 className="text-2xl text-[var(--deep-plum)] mb-3">{journeyCard.title}</h2>
@@ -226,7 +226,7 @@ export default function ParentApp({ onNavigate }: { onNavigate: (screen: string)
         >
           <div className="flex items-center gap-2 mb-4">
             <Heart className="w-5 h-5 text-[var(--coral)]" />
-            <h3 className="text-lg text-[var(--deep-plum)]">Recommended for {prediction.nextStage}</h3>
+            <h3 className="text-lg text-[var(--deep-plum)]">Helpful essentials for {prediction.nextStage}</h3>
           </div>
           <div className="grid grid-cols-2 gap-3 pb-1 sm:grid-cols-3 lg:grid-cols-5">
             {categories.map((category, idx) => (
@@ -248,7 +248,7 @@ export default function ParentApp({ onNavigate }: { onNavigate: (screen: string)
 
         {/* Next Best Action Card */}
         <motion.div
-          className="bg-gradient-to-br from-[var(--pale-peach)] to-[var(--blush-pink)] rounded-3xl p-6 border border-white/40"
+          className="rounded-3xl border border-[rgba(165,13,37,0.08)] bg-[linear-gradient(160deg,rgba(255,248,245,0.98),rgba(244,178,176,0.36))] p-6"
           {...motionConfig.getReveal({ delay: 0.9 })}
           whileHover={motionConfig.cardHoverSoft}
         >
@@ -257,10 +257,10 @@ export default function ParentApp({ onNavigate }: { onNavigate: (screen: string)
               <Calendar className="w-6 h-6 text-[var(--coral)]" />
             </div>
             <div>
-              <h3 className="text-lg text-[var(--deep-plum)] mb-2">Next best action</h3>
+              <h3 className="text-lg text-[var(--deep-plum)] mb-2">A calmer way to prepare</h3>
               <p className="text-[var(--deep-plum)] mb-2">{prediction.nextBestAction}</p>
               <p className="text-[var(--muted-mauve)]">
-                {prediction.nextStage} may be coming in the next {prediction.nextStageWindow}. Risk level: {prediction.riskLevel}.
+                {prediction.nextStage} may be coming in the next {prediction.nextStageWindow}. You&rsquo;ll always be able to adjust this if it doesn&rsquo;t feel right.
               </p>
             </div>
           </div>
@@ -279,8 +279,8 @@ export default function ParentApp({ onNavigate }: { onNavigate: (screen: string)
                   <BookOpen className="w-6 h-6 text-[var(--soft-teal)]" />
                 </div>
                 <div>
-                  <h3 className="text-lg text-[var(--deep-plum)]">Why we think this</h3>
-                  <p className="text-[var(--muted-mauve)]">Signals based on Sara and {family.babyName}&rsquo;s shopping history</p>
+                  <h3 className="text-lg text-[var(--deep-plum)]">Why this may be the right time</h3>
+                  <p className="text-[var(--muted-mauve)]">Gentle signals based on {family.parentName} and {family.babyName}&rsquo;s recent shopping history</p>
                 </div>
               </div>
               <div className="space-y-3">

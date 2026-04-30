@@ -251,11 +251,11 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
                 <ArrowLeft className="w-5 h-5 text-[var(--deep-plum)]" />
               </motion.button>
               <div>
-                <h1 className="text-2xl text-[var(--deep-plum)] sm:text-3xl">MumzMind CRM Intelligence</h1>
-                <p className="text-[var(--muted-mauve)]">Predict family stages, prepare next journeys, and recover at-risk parents</p>
+                <h1 className="text-2xl text-[var(--deep-plum)] sm:text-3xl">MumzMind CRM Dashboard</h1>
+                <p className="text-[var(--muted-mauve)]">Review family stages, prepare next journeys, and notice quiet families early</p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2 rounded-full bg-gradient-to-r from-[var(--rose)] to-[var(--coral)] px-4 py-2 text-white sm:px-5">
+            <div className="flex flex-wrap items-center gap-2 rounded-full border border-[rgba(165,13,37,0.08)] bg-[rgba(255,251,250,0.9)] px-4 py-2 text-[var(--deep-plum)] shadow-[0_12px_28px_rgba(37,0,0,0.06)] sm:px-5">
               <Sparkles className="w-4 h-4" />
               <span className="text-sm">{templateJourneysPrepared} template journeys prepared</span>
             </div>
@@ -274,7 +274,7 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
               {...motionConfig.getReveal({ delay: 0.1 * idx })}
               whileHover={motionConfig.cardHover}
             >
-              <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-20 bg-gradient-to-br ${kpi.color}`} />
+              <div className={`absolute top-0 right-0 h-32 w-32 rounded-full bg-gradient-to-br ${kpi.color} opacity-12 blur-3xl`} />
               <div className="relative z-10">
                 <p className="text-sm text-[var(--muted-mauve)] mb-2">{kpi.label}</p>
                 <p className="text-3xl text-[var(--deep-plum)] mb-2">{kpi.value}</p>
@@ -356,7 +356,7 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
 
         {/* At-Risk Family Table */}
         <motion.div
-          className="rounded-3xl border border-[var(--border)] bg-white p-6 shadow-lg sm:p-8"
+          className="mumz-card rounded-3xl p-6 sm:p-8"
           {...motionConfig.getReveal({ delay: 0.6 })}
         >
           <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -389,7 +389,7 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
                   <div>
                     <p className="text-sm text-[var(--muted-mauve)]">{entry.family.id}</p>
                     <p className="text-base text-[var(--deep-plum)]">
-                      {entry.family.parentName} · {entry.family.babyName}
+                      {entry.family.parentName} &middot; {entry.family.babyName}
                     </p>
                   </div>
                   <span
@@ -479,7 +479,7 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
         {/* Template-Based Journey Generator */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <motion.div
-            className="rounded-3xl border border-white/40 bg-gradient-to-br from-[var(--pale-peach)] to-[var(--blush-pink)] p-6 sm:p-8"
+            className="rounded-3xl border border-[rgba(165,13,37,0.08)] bg-[linear-gradient(160deg,rgba(255,248,245,0.98),rgba(244,178,176,0.34))] p-6 sm:p-8"
             {...motionConfig.getReveal({ delay: 0.8 })}
           >
             <div className="flex items-center gap-3 mb-6">
@@ -567,7 +567,7 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isComplete ? "bg-[var(--soft-teal)] text-white" : isActive ? "bg-[var(--rose)] text-white" : "bg-white text-[var(--muted-mauve)]"}`}>
-                          {isComplete ? "✓" : index + 1}
+                          {isComplete ? "Done" : index + 1}
                         </div>
                         <p className="text-[var(--deep-plum)]">{step}</p>
                       </div>
@@ -580,9 +580,9 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
                 <div className="p-5 rounded-2xl bg-[var(--blush-pink)]/30 border border-[var(--border)]">
                   <div className="flex flex-wrap items-center gap-2 mb-3">
                     <span className="text-xs text-[var(--muted-mauve)]">{generatedJourney.babyName}</span>
-                    <span className="text-xs text-[var(--muted-mauve)]">•</span>
+                    <span className="text-xs text-[var(--muted-mauve)]">&middot;</span>
                     <span className="text-xs text-[var(--muted-mauve)]">{generatedJourney.stage}</span>
-                    <span className="text-xs text-[var(--muted-mauve)]">•</span>
+                    <span className="text-xs text-[var(--muted-mauve)]">&middot;</span>
                     <span className="text-xs text-[var(--muted-mauve)]">{generatedJourney.channel}</span>
                   </div>
                   <p className="text-lg text-[var(--deep-plum)] mb-2">{generatedJourney.card.title}</p>

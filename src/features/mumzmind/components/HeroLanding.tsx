@@ -35,23 +35,23 @@ const floatingCategories = [
 
 const sections = [
   {
-    title: "Shopping history becomes family understanding",
-    description: "MumzMind analyzes purchase patterns to understand each baby's unique journey.",
+    title: "A calmer way to read each family rhythm",
+    description: "Recent shopping moments become gentle stage signals, helping MumzMind prepare what may feel useful next.",
     icon: ShoppingBag,
   },
   {
-    title: "AI predicts what stage comes next",
-    description: "Based on behavioral signals and similar family journeys, we forecast upcoming needs.",
+    title: "Next chapters arrive with more calm and less guesswork",
+    description: "From diaper transitions to first shoes, each stage is prepared with clear, human-friendly guidance.",
     icon: Sparkles,
   },
   {
-    title: "Parents get a gentle Next Chapter feed",
-    description: "Personalized recommendations that feel helpful, not pushy. Always respectful of privacy.",
+    title: "Helpful essentials feel curated, not pushy",
+    description: "Parents see warm, practical suggestions that support the moment without pressure or clutter.",
     icon: Heart,
   },
   {
-    title: "CRM teams get explainable lifecycle intelligence",
-    description: "Transparent AI insights that help teams support families at the right moment.",
+    title: "Teams support families with clarity and care",
+    description: "The CRM view stays explainable and practical, so every outreach feels more thoughtful and timely.",
     icon: Baby,
   },
 ];
@@ -181,13 +181,13 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
   useGsapScroll(scopeRef, setupScrollAnimations, !reducedMotion);
 
   return (
-    <div ref={scopeRef} className="min-h-screen bg-[var(--warm-ivory)] overflow-hidden">
+    <div ref={scopeRef} className="min-h-screen overflow-hidden bg-[var(--warm-ivory)]">
       {/* Animated background mesh */}
-      <div className="fixed inset-0 opacity-30 pointer-events-none">
+      <div className="pointer-events-none fixed inset-0 opacity-20">
         <motion.div
           className="absolute inset-0"
           style={{
-            background: "radial-gradient(circle at 20% 30%, rgba(244, 178, 176, 0.34) 0%, transparent 50%)",
+            background: "radial-gradient(circle at 18% 28%, rgba(244, 178, 176, 0.26) 0%, transparent 46%)",
           }}
           animate={
             reducedMotion
@@ -202,7 +202,7 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
         <motion.div
           className="absolute inset-0"
           style={{
-            background: "radial-gradient(circle at 80% 70%, rgba(222, 58, 87, 0.18) 0%, transparent 50%)",
+            background: "radial-gradient(circle at 82% 66%, rgba(222, 58, 87, 0.14) 0%, transparent 48%)",
           }}
           animate={
             reducedMotion
@@ -214,21 +214,6 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
           }
           transition={reducedMotion ? undefined : { duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
-        <motion.div
-          className="absolute inset-0"
-          style={{
-            background: "radial-gradient(circle at 50% 50%, rgba(217, 111, 120, 0.18) 0%, transparent 50%)",
-          }}
-          animate={
-            reducedMotion
-              ? undefined
-              : {
-                  scale: [1, 1.3, 1],
-                  opacity: [0.2, 0.4, 0.2],
-                }
-          }
-          transition={reducedMotion ? undefined : { duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        />
       </div>
 
       {/* Navigation */}
@@ -237,15 +222,15 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
         className="relative z-10 flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-6 lg:px-8"
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[var(--rose)] to-[var(--coral)]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[linear-gradient(160deg,rgba(222,58,87,0.95),rgba(165,13,37,0.9))] shadow-[0_14px_28px_rgba(165,13,37,0.16)]">
             <Heart className="w-5 h-5 text-white" fill="currentColor" />
           </div>
           <h1 className="text-2xl text-[var(--deep-plum)]">MumzMind</h1>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 self-start rounded-full border border-[var(--border)] bg-white/60 px-4 py-2 text-xs text-[var(--deep-plum)] backdrop-blur-sm sm:self-auto sm:px-5 sm:text-sm">
+        <div className="mumz-badge flex flex-wrap items-center gap-2 self-start rounded-full px-4 py-2 text-xs text-[var(--deep-plum)] sm:self-auto sm:px-5 sm:text-sm">
           <span>English-only</span>
-          <span className="text-xs opacity-60">→</span>
+          <span className="text-xs opacity-60">&rarr;</span>
           <span className="opacity-60">Arabic later</span>
         </div>
       </nav>
@@ -257,28 +242,28 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
           <div>
             <div
               data-hero-badge
-              className="mb-6 inline-flex flex-wrap items-center gap-2 rounded-full border border-[var(--border)] bg-white/60 px-4 py-2 backdrop-blur-sm"
+              className="mumz-badge mb-6 inline-flex flex-wrap items-center gap-2 rounded-full px-4 py-2"
             >
               <Sparkles className="w-4 h-4 text-[var(--rose)]" />
-              <span className="text-sm text-[var(--muted-mauve)]">AI-Powered Family Intelligence</span>
+              <span className="text-sm text-[var(--muted-mauve)]">Gentle stage signals and helpful essentials</span>
             </div>
 
-            <h2 className="mb-6 overflow-hidden text-4xl leading-tight text-[var(--deep-plum)] sm:text-5xl lg:text-6xl">
+            <h2 className="mb-6 overflow-hidden text-4xl leading-[1.04] text-[var(--deep-plum)] sm:text-5xl lg:text-[4.25rem]">
               <span data-hero-line className="block overflow-hidden">
                 Your baby&rsquo;s next chapter,
               </span>
               <span data-hero-line className="block overflow-hidden">
                 <span className="bg-gradient-to-r from-[var(--rose)] to-[var(--coral)] bg-clip-text text-transparent">
-                  predicted with care
+                  prepared with care.
                 </span>
               </span>
-              <span data-hero-line className="block overflow-hidden text-[0.82em] text-[var(--muted-mauve)] pt-2">
-                for every gentle family moment
+              <span data-hero-line className="block overflow-hidden pt-3 text-[0.52em] font-normal text-[var(--muted-mauve)]">
+                A calmer way to prepare for every gentle family moment.
               </span>
             </h2>
 
-            <p data-hero-copy className="mb-8 text-base leading-relaxed text-[var(--muted-mauve)] sm:text-lg">
-              An AI-powered family growth engine that helps Mumzworld understand each parenting journey and gently prepare what comes next.
+            <p data-hero-copy className="mb-8 max-w-xl text-base leading-relaxed text-[var(--muted-mauve)] sm:text-lg">
+              MumzMind helps parents feel ready for each new stage, from feeding changes to first steps, using gentle stage signals and helpful essentials.
             </p>
 
             <div data-hero-actions className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
@@ -288,7 +273,7 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
                 whileTap={tapScale}
                 onClick={() => onNavigate("parent")}
               >
-                View Demo Journey
+                See the parent experience
               </motion.button>
 
               <motion.button
@@ -297,7 +282,7 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
                 whileTap={tapScale}
                 onClick={() => onNavigate("crm")}
               >
-                Explore CRM Intelligence
+                View the CRM preview
               </motion.button>
             </div>
           </div>
@@ -332,7 +317,7 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
                 }}
               >
                 <div className="relative">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] bg-white text-2xl shadow-lg backdrop-blur-sm sm:h-14 sm:w-14 sm:text-[1.65rem] lg:h-16 lg:w-16 lg:text-3xl">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(165,13,37,0.08)] bg-[rgba(255,252,251,0.96)] text-2xl shadow-[0_18px_34px_rgba(37,0,0,0.08)] sm:h-14 sm:w-14 sm:text-[1.65rem] lg:h-16 lg:w-16 lg:text-3xl">
                     <PremiumBabyIcon
                       name={MILESTONE_ICON_MAP[milestone.label] ?? "newborn"}
                       className="h-7 w-7 sm:h-8 sm:w-8 lg:h-10 lg:w-10"
@@ -349,7 +334,7 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
               <div
                 key={category.name}
                 data-category-bubble
-                className="absolute rounded-full border border-white/40 px-3 py-1.5 text-xs shadow-sm backdrop-blur-md sm:px-4 sm:py-2 sm:text-sm"
+                className="absolute rounded-full border border-[rgba(165,13,37,0.08)] px-3 py-1.5 text-xs shadow-[0_12px_22px_rgba(37,0,0,0.05)] backdrop-blur-md sm:px-4 sm:py-2 sm:text-sm"
                 style={{
                   left: `${category.x}%`,
                   top: `${category.y}%`,
@@ -363,7 +348,7 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
 
             <motion.div
               data-prediction-badge
-              className="absolute bottom-4 left-4 right-4 rounded-3xl border border-[var(--border)] bg-white/80 px-4 py-4 shadow-xl backdrop-blur-lg sm:bottom-8 sm:left-auto sm:right-8 sm:w-auto sm:px-6"
+              className="absolute bottom-4 left-4 right-4 rounded-3xl border border-[rgba(165,13,37,0.08)] bg-[rgba(255,252,251,0.88)] px-4 py-4 shadow-[0_22px_36px_rgba(37,0,0,0.08)] backdrop-blur-lg sm:bottom-8 sm:left-auto sm:right-8 sm:w-auto sm:px-6"
               whileHover={hoverScale}
             >
               <div className="flex items-center gap-3">
@@ -371,8 +356,8 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <p className="text-xs text-[var(--muted-mauve)]">Predicted next stage</p>
-                  <p className="text-sm text-[var(--deep-plum)]">Starting Solids in 21 days</p>
+                  <p className="text-xs text-[var(--muted-mauve)]">Your baby&rsquo;s next chapter</p>
+                  <p className="text-sm text-[var(--deep-plum)]">Starting solids may be coming soon</p>
                 </div>
               </div>
             </motion.div>
@@ -381,25 +366,43 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
       </div>
 
       {/* Storytelling Sections */}
-      <div className="relative z-10 mx-auto max-w-6xl space-y-20 px-4 py-20 sm:space-y-28 sm:px-6 sm:py-24 lg:space-y-40 lg:px-8 lg:py-32">
+      <div className="relative z-10 mx-auto max-w-6xl space-y-20 px-4 py-20 sm:space-y-28 sm:px-6 sm:py-24 lg:space-y-32 lg:px-8 lg:py-28">
         {sections.map((section, idx) => (
           <section key={section.title} data-story-section={idx} className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-12">
             {idx % 2 === 0 ? (
               <>
                 <div>
-                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--blush-pink)] to-[var(--mist-lavender)] sm:h-16 sm:w-16">
+                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-[1.35rem] border border-[rgba(165,13,37,0.08)] bg-[rgba(255,251,250,0.88)] shadow-[0_14px_26px_rgba(37,0,0,0.05)] sm:h-16 sm:w-16">
                     <section.icon className="w-8 h-8 text-[var(--rose)]" />
                   </div>
                   <h3 className="mb-4 text-2xl text-[var(--deep-plum)] sm:text-3xl">{section.title}</h3>
                   <p className="text-base leading-relaxed text-[var(--muted-mauve)] sm:text-lg">{section.description}</p>
                 </div>
-                <div className="h-56 rounded-3xl bg-gradient-to-br from-[var(--blush-pink)] to-[var(--pale-peach)] opacity-40 sm:h-72 lg:h-80" />
+                <div className="mumz-card-soft h-56 rounded-[2rem] bg-[linear-gradient(160deg,rgba(255,250,248,0.96),rgba(244,178,176,0.34))] p-8 sm:h-72 lg:h-80">
+                  <div className="flex h-full flex-col justify-between rounded-[1.6rem] border border-white/70 bg-[rgba(255,255,255,0.48)] p-6">
+                    <p className="max-w-sm text-sm uppercase tracking-[0.18em] text-[var(--muted-mauve)]">Prepared gently</p>
+                    <div className="space-y-3">
+                      <div className="h-3 w-2/3 rounded-full bg-[rgba(165,13,37,0.12)]" />
+                      <div className="h-3 w-1/2 rounded-full bg-[rgba(222,58,87,0.18)]" />
+                      <div className="h-3 w-3/4 rounded-full bg-[rgba(244,178,176,0.3)]" />
+                    </div>
+                  </div>
+                </div>
               </>
             ) : (
               <>
-                <div className="h-56 rounded-3xl bg-gradient-to-br from-[var(--mist-lavender)] to-[var(--soft-mint)] opacity-40 sm:h-72 lg:order-first lg:h-80" />
+                <div className="mumz-card-soft h-56 rounded-[2rem] bg-[linear-gradient(155deg,rgba(255,250,248,0.96),rgba(250,225,226,0.7))] p-8 sm:h-72 lg:order-first lg:h-80">
+                  <div className="flex h-full flex-col justify-between rounded-[1.6rem] border border-white/70 bg-[rgba(255,255,255,0.48)] p-6">
+                    <p className="max-w-sm text-sm uppercase tracking-[0.18em] text-[var(--muted-mauve)]">A calmer way to prepare</p>
+                    <div className="space-y-3">
+                      <div className="h-3 w-1/2 rounded-full bg-[rgba(244,178,176,0.3)]" />
+                      <div className="h-3 w-3/4 rounded-full bg-[rgba(165,13,37,0.12)]" />
+                      <div className="h-3 w-2/3 rounded-full bg-[rgba(222,58,87,0.18)]" />
+                    </div>
+                  </div>
+                </div>
                 <div>
-                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--soft-mint)] to-[var(--powder-blue)] sm:h-16 sm:w-16">
+                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-[1.35rem] border border-[rgba(165,13,37,0.08)] bg-[rgba(255,251,250,0.88)] shadow-[0_14px_26px_rgba(37,0,0,0.05)] sm:h-16 sm:w-16">
                     <section.icon className="w-8 h-8 text-[var(--soft-teal)]" />
                   </div>
                   <h3 className="mb-4 text-2xl text-[var(--deep-plum)] sm:text-3xl">{section.title}</h3>
@@ -413,9 +416,9 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
 
       {/* Footer CTA */}
       <div data-footer-cta className="relative z-10 mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-8">
-        <h3 className="mb-6 text-3xl text-[var(--deep-plum)] sm:text-4xl">Ready to explore?</h3>
+        <h3 className="mb-6 text-3xl text-[var(--deep-plum)] sm:text-4xl">Prepared gently for your family</h3>
         <p className="mb-8 text-base text-[var(--muted-mauve)] sm:text-lg">
-          See how MumzMind creates gentle, personalized family journeys.
+          See how MumzMind turns stage signals into a calmer, more practical parent experience.
         </p>
         <motion.button
           className="mumz-primary-button w-full rounded-full px-6 py-3.5 text-white sm:w-auto sm:px-8 sm:py-4"
@@ -423,7 +426,7 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
           whileTap={tapScale}
           onClick={() => onNavigate("parent")}
         >
-          View Parent Experience
+          Open the parent experience
         </motion.button>
       </div>
     </div>

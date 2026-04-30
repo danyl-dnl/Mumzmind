@@ -183,7 +183,7 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
             </motion.button>
             <div>
               <h1 className="text-2xl text-[var(--deep-plum)] sm:text-[2rem]">{family.babyName}&rsquo;s Growth Journey</h1>
-              <p className="text-[var(--muted-mauve)] text-sm">Predicted milestones and stages</p>
+              <p className="text-[var(--muted-mauve)] text-sm">A gentle view of what may come next</p>
             </div>
           </div>
 
@@ -216,8 +216,8 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
               <span className="px-4 py-2 rounded-full bg-[var(--warm-ivory)] text-sm text-[var(--deep-plum)]">
                 Window: {prediction.nextStageWindow}
               </span>
-              <span className="px-4 py-2 rounded-full bg-[var(--blush-pink)]/50 text-sm text-[var(--deep-plum)]">
-                Powered by local lifecycle rules — no AI API
+              <span className="mumz-badge rounded-full px-4 py-2 text-sm text-[var(--deep-plum)]">
+                Prepared from gentle lifecycle signals
               </span>
             </div>
           </motion.div>
@@ -227,7 +227,7 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
       {/* Timeline */}
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="relative">
-          <div className="absolute bottom-0 left-5 top-0 w-0.5 bg-gradient-to-b from-[var(--soft-teal)] via-[var(--rose)] to-transparent opacity-20 sm:left-8" />
+          <div className="absolute bottom-0 left-5 top-0 w-0.5 bg-gradient-to-b from-[rgba(217,111,120,0.18)] via-[rgba(222,58,87,0.36)] to-transparent sm:left-8" />
 
           <div className="space-y-8">
             {timelineStages.map((stage, idx) => (
@@ -272,10 +272,10 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
                   <motion.div
                     className={`flex-1 rounded-2xl p-4 sm:p-6 ${
                       stage.status === "current"
-                        ? "bg-gradient-to-br from-white to-[var(--blush-pink)] shadow-xl border-2 border-[var(--rose)]/20"
+                        ? "border-2 border-[rgba(165,13,37,0.12)] bg-[linear-gradient(160deg,rgba(255,255,255,0.98),rgba(244,178,176,0.24))] shadow-[0_20px_38px_rgba(37,0,0,0.08)]"
                         : stage.status === "past"
-                          ? "bg-white/60 border border-[var(--border)]"
-                          : "bg-white/40 border border-[var(--border)]"
+                          ? "border border-[var(--border)] bg-[rgba(255,252,251,0.9)] shadow-[0_12px_26px_rgba(37,0,0,0.05)]"
+                          : "border border-[var(--border)] bg-[rgba(255,255,255,0.56)]"
                     }`}
                     whileHover={motionConfig.cardHover}
                   >
@@ -357,12 +357,12 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
                 <Sparkles className="w-6 h-6 text-[var(--soft-teal)]" />
               </div>
               <div>
-                <h3 className="text-xl text-[var(--deep-plum)]">Why we think this</h3>
-                <p className="text-sm text-[var(--muted-mauve)]">Signals based on {family.parentName} and {family.babyName}&rsquo;s purchase history</p>
+                <h3 className="text-xl text-[var(--deep-plum)]">Why this may be the right time</h3>
+                <p className="text-sm text-[var(--muted-mauve)]">Gentle signals based on {family.parentName} and {family.babyName}&rsquo;s purchase history</p>
               </div>
             </div>
-            <span className="px-3 py-1 rounded-full bg-[var(--blush-pink)]/50 text-xs text-[var(--deep-plum)]">
-              Powered by local lifecycle rules — no AI API
+            <span className="mumz-badge rounded-full px-3 py-1 text-xs text-[var(--deep-plum)]">
+              Local lifecycle rules
             </span>
           </div>
 
@@ -403,7 +403,7 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
               whileHover={motionConfig.buttonHover}
               whileTap={motionConfig.gentleTap}
             >
-              Review timeline details
+              See stage details
             </motion.button>
           </div>
         </div>

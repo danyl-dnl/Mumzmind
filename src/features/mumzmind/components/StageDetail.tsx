@@ -232,7 +232,7 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
               <ArrowLeft className="w-5 h-5 text-[var(--deep-plum)]" />
             </motion.button>
             <div>
-              <h1 className="text-2xl text-[var(--deep-plum)] sm:text-3xl">Next Chapter: {prediction.nextStage}</h1>
+              <h1 className="text-2xl text-[var(--deep-plum)] sm:text-3xl">Your baby&rsquo;s next chapter: {prediction.nextStage}</h1>
               <p className="text-[var(--muted-mauve)]">
                 {family.babyName}&rsquo;s predicted window is {prediction.nextStageWindow} with {prediction.confidence}% confidence
               </p>
@@ -255,8 +255,8 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <h2 className="text-xl text-[var(--deep-plum)]">Why this matters</h2>
-                <span className="px-3 py-1 rounded-full bg-[var(--blush-pink)]/50 text-xs text-[var(--deep-plum)]">
-                  Powered by local lifecycle rules — no AI API
+                <span className="mumz-badge rounded-full px-3 py-1 text-xs text-[var(--deep-plum)]">
+                  Prepared with local lifecycle rules
                 </span>
               </div>
               <p className="text-[var(--muted-mauve)] leading-relaxed mb-4">
@@ -308,7 +308,7 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
 
         {/* Parent-Loved Picks */}
         <motion.div
-          className="rounded-3xl border border-white/40 bg-gradient-to-br from-[var(--pale-peach)] to-[var(--blush-pink)] p-6 sm:p-8"
+          className="rounded-3xl border border-[rgba(165,13,37,0.08)] bg-[linear-gradient(160deg,rgba(255,248,245,0.98),rgba(244,178,176,0.34))] p-6 sm:p-8"
           {...motionConfig.getReveal({ delay: 0.5 })}
         >
           <div className="flex items-center gap-3 mb-6">
@@ -405,7 +405,7 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
 
         {/* English-Only Template Journey Card */}
         <motion.div
-          className="rounded-3xl border border-white/40 bg-gradient-to-br from-[var(--mist-lavender)] to-[var(--powder-blue)] p-6 sm:p-8"
+          className="rounded-3xl border border-[rgba(165,13,37,0.08)] bg-[linear-gradient(160deg,rgba(255,250,248,0.98),rgba(250,225,226,0.7))] p-6 sm:p-8"
           {...motionConfig.getReveal({ delay: 1 })}
         >
           <div className="flex items-start gap-4 mb-6">
@@ -414,7 +414,7 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
             </div>
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <h2 className="text-xl text-[var(--deep-plum)]">Next Chapter journey card</h2>
+                <h2 className="text-xl text-[var(--deep-plum)]">Next Chapter message preview</h2>
                 <span className="px-3 py-1 rounded-full bg-white/70 text-xs text-[var(--deep-plum)]">English-only template</span>
               </div>
               <div className="space-y-4">
@@ -452,7 +452,7 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
             whileHover={motionConfig.buttonHoverStrong}
             whileTap={motionConfig.gentleTap}
           >
-            Add starter bundle
+            Save these essentials
           </motion.button>
           <motion.button
             className="mumz-secondary-button flex items-center justify-center gap-2 rounded-full px-8 py-4 text-[var(--deep-plum)]"
@@ -460,7 +460,7 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
             whileTap={motionConfig.gentleTap}
           >
             <MessageCircle className="w-5 h-5" />
-            Send to WhatsApp
+            Share the guide
           </motion.button>
           <motion.button
             className="mumz-secondary-button flex items-center justify-center gap-2 rounded-full px-8 py-4 text-[var(--deep-plum)]"
@@ -468,7 +468,7 @@ export default function StageDetail({ onNavigate }: { onNavigate: (screen: strin
             whileTap={motionConfig.gentleTap}
           >
             <Sparkles className="w-5 h-5" />
-            Review template preview
+            Review message preview
           </motion.button>
         </motion.div>
       </div>
