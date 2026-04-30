@@ -16,15 +16,7 @@ Modern parents are often overwhelmed by the rapid transitions between developmen
 **Track Selected:** Track A
 
 ## 🔗 Live Demo
-[View Live Demo](https://mumzmind.vercel.app)
-
----
-
-## 📸 Screenshots & Previews
-
-| The Journey Ahead (Timeline) | Predictive Intelligence |
-| :---: | :---: |
-| ![Timeline View](public/mumzmind/timeline/six-months.jpg) | ![Predictive Analysis](public/mumzmind/timeline/newborn.jpg) |
+[View Live Demo](https://mumzworldai.vercel.app/)
 
 ---
 
@@ -55,13 +47,6 @@ The "Intelligence" in MumzMind is powered by a deterministic **Stage Engine** (`
    - If a user adds "Baby Cereal" to their cart, the engine infers they are approaching the **Starting Solids** stage.
    - It calculates a **Confidence Score** based on timing, purchase frequency, and data freshness.
 4. **Predictive Windows**: Each stage has a defined "Next Stage" and a timing window (e.g., "Starting Solids" is predicted 2-4 weeks before the transition).
-
----
-
-## 🚫 No-AI-API Note
-> [!IMPORTANT]
-> **This project does NOT use any external LLM APIs (such as Gemini, OpenAI, or Claude).**
-> All "intelligence" and predictions are handled locally via the deterministic rule-based engine. This was a conscious design choice to ensure **zero-latency responses**, 100% predictable behavior for the retail prototype, and a focus on high-fidelity UI/UX without the cost or complexity of real-time LLM calls.
 
 ---
 
@@ -100,5 +85,4 @@ The "Intelligence" in MumzMind is powered by a deterministic **Stage Engine** (`
 4. **Access the application:**
    Navigate to `http://localhost:3000` in your browser.
 
----
-*Created with ❤️ for the MumzMind Experience.*
+
