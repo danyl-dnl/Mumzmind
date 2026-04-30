@@ -104,7 +104,7 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
   
   const prediction = predictBabyStage({
     ...family,
-    babyAgeMonths: typeof userAge === 'number' ? userAge : 0
+    predictedAgeMonths: typeof userAge === 'number' ? userAge : 0
   });
 
   const activeMilestoneIndex = getNearestMilestoneIndex(prediction.predictedAgeMonths);
