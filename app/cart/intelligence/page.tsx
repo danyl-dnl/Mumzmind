@@ -4,20 +4,12 @@ import HeroLanding from "@/src/features/mumzmind/components/HeroLanding";
 import MumzMindRouteFrame from "@/src/features/mumzmind/components/MumzMindRouteFrame";
 import { useMumzMindNavigate } from "@/src/features/mumzmind/useMumzMindNavigate";
 
-import { useState } from "react";
-import LoadingScreen from "@/src/features/mumzmind/components/LoadingScreen";
-
-export default function Home() {
+export default function IntelligencePage() {
   const onNavigate = useMumzMindNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-
-  if (isLoading) {
-    return <LoadingScreen onComplete={() => setIsLoading(false)} />;
-  }
 
   return (
     <MumzMindRouteFrame>
-      <HeroLanding onNavigate={onNavigate} />
+      <HeroLanding onNavigate={onNavigate} initialView="extension" />
     </MumzMindRouteFrame>
   );
 }

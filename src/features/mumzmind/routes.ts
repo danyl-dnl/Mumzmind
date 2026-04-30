@@ -5,6 +5,7 @@ export const mumzMindRouteMap = {
   stage: "/stage",
   crm: "/crm",
   cart: "/cart",
+  intelligence: "/cart/intelligence",
   deals: "/deals",
   brands: "/brands",
 } as const;

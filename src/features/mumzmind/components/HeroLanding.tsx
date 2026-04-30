@@ -121,7 +121,7 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
   };
 
   const startCheckout = () => {
-    setCurrentView("extension");
+    onNavigate("intelligence");
   };
 
   const getPrediction = () => {
