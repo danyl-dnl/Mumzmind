@@ -2,11 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { StaggeredMenu } from "@/components/ui/staggered-menu";
 
 import { mumzMindNavLinks } from "../routes";
 
 export default function MumzMindNav() {
   const pathname = usePathname();
+  const mobileMenuItems = [
+    { href: "/", label: "Home", eyebrow: "Start here" },
+    { href: "/parent", label: "Parent Feed", eyebrow: "Everyday view" },
+    { href: "/timeline", label: "Baby Timeline", eyebrow: "Journey" },
+    { href: "/stage", label: "Next Chapter", eyebrow: "Preparation" },
+    { href: "/crm", label: "CRM View", eyebrow: "Team view" },
+  ] as const;
 
   return (
     <div className="sticky top-0 z-[60] px-3 pt-3 sm:px-6">
@@ -18,16 +26,28 @@ export default function MumzMindNav() {
               <div className="text-xs text-[var(--muted-mauve)]">Prepared gently for growing families</div>
             </div>
 
-            <div className="rounded-full border border-[var(--blush-pink)]/60 bg-white/80 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--deep-berry)] sm:hidden">
-              Local Demo
+            <div className="flex items-center gap-2 lg:hidden">
+              <div className="rounded-full border border-[var(--blush-pink)]/60 bg-white/80 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--deep-berry)]">
+                Next Chapter
+              </div>
+              <StaggeredMenu
+                items={mobileMenuItems}
+                logo="MumzMind"
+                subtitle="Next Chapter"
+                badge="Mobile menu"
+                colors={["#250000", "#A50D25", "#FFF8F5"]}
+                accentColor="#DE3A57"
+                menuButtonColor="#250000"
+                openMenuButtonColor="#250000"
+              />
             </div>
           </div>
 
-          <div className="hidden rounded-full border border-[var(--blush-pink)]/60 bg-white/80 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--deep-berry)] sm:inline-flex">
+          <div className="hidden rounded-full border border-[var(--blush-pink)]/60 bg-white/80 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--deep-berry)] lg:inline-flex">
             Local Rules Demo
           </div>
 
-          <div className="flex min-w-0 flex-wrap items-center gap-2 lg:flex-1 lg:justify-end">
+          <div className="hidden min-w-0 flex-wrap items-center gap-2 lg:flex lg:flex-1 lg:justify-end">
             {mumzMindNavLinks.map((link) => {
               const isActive = pathname === link.href;
 
