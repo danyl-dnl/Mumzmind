@@ -16,15 +16,7 @@ Modern parents are often overwhelmed by the rapid transitions between developmen
 **Track Selected:** Track A
 
 ## 🔗 Live Demo
-[View Live Demo](https://mumzmind.vercel.app)
-
----
-
-## 📸 Screenshots & Previews
-
-| The Journey Ahead (Timeline) | Predictive Intelligence |
-| :---: | :---: |
-| ![Timeline View](public/mumzmind/timeline/six-months.jpg) | ![Predictive Analysis](public/mumzmind/timeline/newborn.jpg) |
+[View Live Demo](https://mumzworldai.vercel.app/)
 
 ---
 
@@ -100,5 +92,4 @@ The "Intelligence" in MumzMind is powered by a deterministic **Stage Engine** (`
 4. **Access the application:**
    Navigate to `http://localhost:3000` in your browser.
 
----
-*Created with ❤️ for the MumzMind Experience.*
+
