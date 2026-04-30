@@ -28,8 +28,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "Newborn",
     description: "Getting to know the world with comfort and care.",
     placeholderLabel: "Newborn image",
-    imageSrc: "/mumzmind/timeline/newborn.jpg",
-    imageAlt: "Soft newborn care scene",
+    imageSrc: "/mumzmind/timeline/baby_stage_0.png",
+    imageAlt: "Cartoon illustration of a newborn",
     iconName: "newborn",
   },
   {
@@ -37,8 +37,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "Early Smiles",
     description: "Smiling more and discovering familiar faces.",
     placeholderLabel: "2-month image",
-    imageSrc: "/mumzmind/timeline/two-months.jpg",
-    imageAlt: "Two-month baby milestone scene",
+    imageSrc: "/mumzmind/timeline/baby_stage_2.png",
+    imageAlt: "Cartoon illustration of a two month baby",
     iconName: "newborn",
   },
   {
@@ -46,8 +46,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "Rolling & Reaching",
     description: "More movement and reaching for favorite things.",
     placeholderLabel: "4-month image",
-    imageSrc: "/mumzmind/timeline/four-months.jpg",
-    imageAlt: "Four-month rolling and reaching milestone scene",
+    imageSrc: "/mumzmind/timeline/baby_stage_4.png",
+    imageAlt: "Cartoon illustration of a rolling four month baby",
     iconName: "playmat",
   },
   {
@@ -55,8 +55,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "Sitting Up",
     description: "Sitting with support and showing more personality.",
     placeholderLabel: "6-month image",
-    imageSrc: "/mumzmind/timeline/six-months.jpg",
-    imageAlt: "Six-month sitting up and starting solids milestone scene",
+    imageSrc: "/mumzmind/timeline/baby_stage_6.png",
+    imageAlt: "Cartoon illustration of a six month baby sitting",
     iconName: "chair",
   },
   {
@@ -64,8 +64,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "Crawling & Exploring",
     description: "Getting curious and exploring the world around them.",
     placeholderLabel: "8-month image",
-    imageSrc: "/mumzmind/timeline/eight-months.jpg",
-    imageAlt: "Eight-month crawling and exploring milestone scene",
+    imageSrc: "/mumzmind/timeline/baby_stage_8.png",
+    imageAlt: "Cartoon illustration of a crawling eight month baby",
     iconName: "teddy",
   },
   {
@@ -73,8 +73,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "First Steps",
     description: "Walking with support and celebrating big milestones.",
     placeholderLabel: "12-month image",
-    imageSrc: "/mumzmind/timeline/twelve-months.jpg",
-    imageAlt: "Twelve-month first steps milestone scene",
+    imageSrc: "/mumzmind/timeline/baby_stage_12.png",
+    imageAlt: "Cartoon illustration of a twelve month baby taking steps",
     iconName: "shoe",
   },
 ];
@@ -97,9 +97,16 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
   const families = familiesData as FamilyProfile[];
   const stageCatalog = stagesData as BabyStage[];
   const family =
-    families.find((entry) => entry.parentName === "Sara" && entry.babyName === "Omar") ??
+    families.find((entry) => entry.parentName === "Sara" && entry.babyName === "Baby") ??
     families[0];
-  const prediction = predictBabyStage(family);
+  
+  const [userAge, setUserAge] = useState<number | string>(6);
+  
+  const prediction = predictBabyStage({
+    ...family,
+    babyAgeMonths: typeof userAge === 'number' ? userAge : 0
+  });
+
   const activeMilestoneIndex = getNearestMilestoneIndex(prediction.predictedAgeMonths);
   const activeMilestone = FIRST_YEAR_MILESTONES[activeMilestoneIndex];
   const currentStageInfo =
@@ -133,6 +140,27 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
           </h1>
           <p className="mt-3 text-base leading-relaxed text-[var(--muted-mauve)] sm:text-lg">
             A beautiful journey of growth, discovery and endless firsts.
+          </p>
+
+          <div className="mt-8 inline-flex items-center gap-4 rounded-[2rem] bg-white/60 p-2 pl-6 shadow-sm ring-1 ring-[rgba(42,18,18,0.05)] backdrop-blur-sm">
+            <span className="text-sm font-medium text-[var(--deep-plum)]">Personalize your journey:</span>
+            <div className="flex items-center gap-2">
+              <input 
+                type="number" 
+                value={userAge}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setUserAge(val === '' ? '' : parseInt(val));
+                }}
+                className="w-16 rounded-xl border-none bg-white px-3 py-2 text-center text-sm font-bold text-[var(--deep-berry)] shadow-inner ring-1 ring-[rgba(201,47,75,0.1)] focus:ring-2 focus:ring-[var(--deep-berry)]"
+                min="0"
+                max="24"
+              />
+              <span className="text-sm text-[var(--muted-mauve)] font-medium">months old</span>
+            </div>
+          </div>
+          <p className="mt-4 text-[11px] text-[var(--muted-mauve)] italic">
+            Enter your baby's exact age for personalized recommendations and exclusive stage-based offers.
           </p>
         </motion.section>
 
@@ -185,32 +213,50 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
                         )}
                       </div>
 
-                      <div className="mt-5 min-h-[4.5rem] px-2">
+                      <div className="mt-5 h-[5rem] px-2 relative w-full flex items-end justify-center">
                         {isActive ? (
-                          <div className="rounded-[1.3rem] border border-[rgba(201,47,75,0.12)] bg-white/92 px-4 py-3 shadow-[0_12px_28px_rgba(42,18,18,0.04)]">
-                            <p className="text-sm text-[var(--deep-plum)]">
-                              {family.babyName} may be nearing {prediction.nextStage}
+                          <div className="absolute bottom-1 w-[max-content] max-w-[160px] rounded-[1.3rem] border border-[rgba(201,47,75,0.12)] bg-white/92 px-4 py-2.5 shadow-[0_12px_28px_rgba(42,18,18,0.04)] z-20">
+                            <p className="text-sm text-[var(--deep-plum)] leading-tight">
+                              {family.babyName} may be nearing<br />
+                              <span className="font-semibold text-[var(--deep-berry)]">{prediction.nextStage}</span>
                             </p>
                           </div>
                         ) : null}
                       </div>
 
-                      <div className="relative mt-1 flex w-full items-center justify-center px-2">
-                        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 border-t border-[rgba(42,18,18,0.12)]" />
-                        <div
-                          className={`relative z-10 flex h-12 w-12 items-center justify-center rounded-full border text-sm shadow-[0_10px_20px_rgba(42,18,18,0.04)] ${
-                            isActive
-                              ? "h-14 w-14 border-[rgba(143,16,37,0.18)] bg-[linear-gradient(180deg,rgba(201,47,75,0.98),rgba(143,16,37,0.96))] text-white ring-[10px] ring-[rgba(248,216,213,0.5)] shadow-[0_0_0_1px_rgba(255,255,255,0.72),0_0_0_16px_rgba(248,216,213,0.24),0_18px_34px_rgba(143,16,37,0.16),0_0_34px_rgba(201,47,75,0.14)]"
-                              : isPast
-                                ? "border-[rgba(42,18,18,0.09)] bg-white text-[var(--deep-plum)]"
-                                : "border-[rgba(42,18,18,0.08)] bg-[rgba(255,251,247,0.98)] text-[var(--deep-plum)]"
-                          }`}
-                        >
-                          {milestone.month}
+                      <div className="relative mt-2 flex w-full items-center justify-center px-2 py-4">
+                        {/* Connecting Line */}
+                        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[3px] bg-[rgba(42,18,18,0.04)]">
+                           {(isPast || isActive) && (
+                             <div 
+                               className={`h-full bg-[linear-gradient(90deg,#E6C5C3,#C92F4B)] transition-all duration-700 ${isActive ? 'w-1/2' : 'w-full'} ${index === 0 ? 'rounded-l-full' : ''}`}
+                             />
+                           )}
+                        </div>
+                        
+                        {/* The Node */}
+                        <div className="relative z-10">
+                          {isActive && (
+                            <>
+                              <div className="absolute inset-0 rounded-full bg-[var(--deep-berry)] blur-[10px] opacity-30 animate-[pulse_2s_ease-in-out_infinite]" />
+                              <div className="absolute -inset-3 rounded-full border border-[var(--deep-berry)] opacity-20 animate-[ping_3s_ease-in-out_infinite]" />
+                            </>
+                          )}
+                          <div
+                            className={`relative flex items-center justify-center rounded-full text-[15px] font-semibold transition-all duration-500 z-10 ${
+                              isActive
+                                ? "h-14 w-14 border-[3px] border-[var(--deep-berry)] bg-white text-[var(--deep-berry)] shadow-[0_0_15px_rgba(201,47,75,0.3)] scale-110"
+                                : isPast
+                                  ? "h-12 w-12 border-2 border-white bg-[linear-gradient(135deg,var(--blush-pink),#DDA7A5)] text-white shadow-md"
+                                  : "h-12 w-12 border-2 border-white bg-[rgba(243,230,220,0.5)] text-[var(--muted-mauve)] shadow-sm"
+                            }`}
+                          >
+                            {milestone.month}
+                          </div>
                         </div>
                       </div>
 
-                      <div className="mt-6 px-2">
+                      <div className="mt-8 px-2">
                         <p className="text-sm uppercase tracking-[0.14em] text-[var(--muted-mauve)]">
                           {milestone.month} month
                         </p>
@@ -311,9 +357,14 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
         </div>
 
         <motion.div
-          className="mt-10 text-center"
+          className="mt-12 max-w-2xl mx-auto text-center"
           {...motionConfig.getReveal({ delay: 0.36, duration: 0.45 })}
         >
+          <div className="mb-6 rounded-[1.5rem] bg-[rgba(248,216,213,0.15)] p-4 border border-[rgba(201,47,75,0.1)]">
+            <p className="text-[12px] text-[var(--deep-berry)] font-medium leading-relaxed italic">
+              Disclaimer: This is a demonstration of the MumzMind concept. While we map products to developmental stages, no live AI model is currently processing this data. Predictions are based on simplified logic and may be incorrect.
+            </p>
+          </div>
           <p className="text-base text-[var(--muted-mauve)]">
             Every baby grows at their own pace. Celebrate every little milestone.
           </p>

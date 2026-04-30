@@ -100,7 +100,7 @@ export default function ParentApp({ onNavigate }: { onNavigate: (screen: string)
 
   const families = familiesData as FamilyProfile[];
   const family =
-    families.find((entry) => entry.parentName === "Sara" && entry.babyName === "Omar") ??
+    families.find((entry) => entry.parentName === "Sara" && entry.babyName === "Baby") ??
     families[0];
   const prediction = predictBabyStage(family);
   const journeyCard = generateJourneyCard({

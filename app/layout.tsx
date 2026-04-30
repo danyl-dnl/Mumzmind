@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   description: "AI-powered baby stage intelligence demo for Mumzworld.",
 };
 
+import { CartProvider } from "@/src/features/mumzmind/CartContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,7 +29,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <CartProvider>{children}</CartProvider>
+      </body>
     </html>
   );
 }

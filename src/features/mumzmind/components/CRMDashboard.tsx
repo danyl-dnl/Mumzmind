@@ -94,7 +94,7 @@ export default function CRMDashboard({ onNavigate }: { onNavigate: (screen: stri
   }));
 
   const explainabilityExample =
-    insights.find((entry) => entry.family.parentName === "Sara" && entry.family.babyName === "Omar") ??
+    insights.find((entry) => entry.family.parentName === "Sara" && entry.family.babyName === "Baby") ??
     insights[0];
 
   const [selectedStage, setSelectedStage] = useState<(typeof TEMPLATE_STAGE_OPTIONS)[number]>(

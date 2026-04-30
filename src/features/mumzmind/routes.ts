@@ -4,14 +4,16 @@ export const mumzMindRouteMap = {
   timeline: "/timeline",
   stage: "/stage",
   crm: "/crm",
+  cart: "/cart",
+  deals: "/deals",
+  brands: "/brands",
 } as const;
 
 export type MumzMindScreen = keyof typeof mumzMindRouteMap;
 
 export const mumzMindNavLinks = [
-  { href: "/", label: "Home" },
-  { href: "/parent", label: "Parent Feed" },
-  { href: "/timeline", label: "Baby Timeline" },
-  { href: "/stage", label: "Next Chapter" },
-  { href: "/crm", label: "CRM View" },
+  { href: "/", label: "Store" },
+  { href: "/deals", label: "Deals" },
+  { href: "/brands", label: "Brands" },
+  { href: "/cart", label: "Cart" },
 ] as const;
