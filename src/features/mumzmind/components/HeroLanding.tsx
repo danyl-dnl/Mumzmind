@@ -22,11 +22,73 @@ const STORE_ITEMS = [
 const MILESTONES = [
   { month: 0, title: "Newborn", desc: "Care & Comfort", image: "/mumzmind/timeline/baby_stage_0.png", stageKey: "Newborn Care" },
   { month: 2, title: "Early Smiles", desc: "Discovery", image: "/mumzmind/timeline/baby_stage_2.png", stageKey: "Feeding Routine" },
-  { month: 4, title: "Rolling", desc: "Movement", image: "/mumzmind/timeline/baby_stage_4.png", stageKey: "Crawling Prep" },
+  { month: 4, title: "Rolling", desc: "Movement", image: "/mumzmind/timeline/baby_stage_4.png", stageKey: "Rolling" },
   { month: 6, title: "Sitting Up", desc: "Personality", image: "/mumzmind/timeline/baby_stage_6.png", stageKey: "Starting Solids" },
-  { month: 8, title: "Crawling", desc: "Exploring", image: "/mumzmind/timeline/baby_stage_8.png", stageKey: "Crawling Prep" },
+  { month: 8, title: "Crawling", desc: "Exploring", image: "/mumzmind/timeline/baby_stage_8.png", stageKey: "Crawling" },
   { month: 12, title: "First Steps", desc: "Milestones", image: "/mumzmind/timeline/baby_stage_12.png", stageKey: "First Steps" },
 ];
+
+const STAGE_KITS: Record<string, {
+  tagline: string;
+  bundlePrice: string;
+  saving: string;
+  products: { icon: PremiumBabyIconName; name: string; desc: string }[];
+}> = {
+  "Newborn Care": {
+    tagline: "Everything your newborn needs from day one.",
+    bundlePrice: "+$59.00",
+    saving: "Save 12% with this bundle",
+    products: [
+      { icon: "diaper", name: "Premium Diapers Size 1", desc: "Ultra-soft for sensitive skin" },
+      { icon: "bottle", name: "Anti-Colic Bottle Set", desc: "Natural flow for newborns" },
+    ],
+  },
+  "Feeding Routine": {
+    tagline: "Build healthy feeding habits from 2 months.",
+    bundlePrice: "+$47.00",
+    saving: "Save 10% with this bundle",
+    products: [
+      { icon: "bottle", name: "Anti-Colic Bottle Set", desc: "Reduce gas & discomfort" },
+      { icon: "bib", name: "Silicone Catch Bibs", desc: "Waterproof, easy to clean" },
+    ],
+  },
+  "Rolling": {
+    tagline: "Support movement and sensory exploration.",
+    bundlePrice: "+$67.00",
+    saving: "Save 13% with this bundle",
+    products: [
+      { icon: "playmat", name: "Luxury Play Mat", desc: "Non-toxic tummy time surface" },
+      { icon: "teddy", name: "Crawling Bear Toy", desc: "Encourages reaching & grasping" },
+    ],
+  },
+  "Starting Solids": {
+    tagline: "Your baby is ready for their first real meals.",
+    bundlePrice: "+$144.00",
+    saving: "Save 15% with this bundle",
+    products: [
+      { icon: "chair", name: "Ergonomic High Chair", desc: "Grows with your little one" },
+      { icon: "bib", name: "Silicone Catch Bibs", desc: "Set of 2, mess-free feeding" },
+    ],
+  },
+  "Crawling": {
+    tagline: "Your explorer needs safe space to roam.",
+    bundlePrice: "+$67.00",
+    saving: "Save 13% with this bundle",
+    products: [
+      { icon: "teddy", name: "Crawling Bear Toy", desc: "Motivates forward movement" },
+      { icon: "playmat", name: "Luxury Play Mat", desc: "Cushioned, safe crawling surface" },
+    ],
+  },
+  "First Steps": {
+    tagline: "Gear up for the biggest milestone yet.",
+    bundlePrice: "+$41.00",
+    saving: "Save 10% with this bundle",
+    products: [
+      { icon: "shoe", name: "First Walker Shoes", desc: "Flexible support for tiny feet" },
+      { icon: "cup", name: "No-Spill Sippy Cup", desc: "Perfect for on-the-go toddlers" },
+    ],
+  },
+};
 
 export default function HeroLanding({ onNavigate, initialView = "store" }: { onNavigate: (screen: string) => void, initialView?: "store" | "cart" }) {
   const { cart, addToCart, decrementCart, clearCart, totalPrice, totalItems } = useCart();
@@ -62,12 +124,13 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
 
   // Dynamic Prediction Logic
   const getPrediction = () => {
-    // If manual age is set, use it to find the stage
+    // If manual age is set, map it to the correct unique milestone stageKey
     if (manualAge !== null) {
       if (manualAge < 2) return { stage: "Newborn Care", items: ["Personal Input"], source: "manual" };
       if (manualAge < 4) return { stage: "Feeding Routine", items: ["Personal Input"], source: "manual" };
-      if (manualAge < 6) return { stage: "Crawling Prep", items: ["Personal Input"], source: "manual" };
-      if (manualAge < 10) return { stage: "Starting Solids", items: ["Personal Input"], source: "manual" };
+      if (manualAge < 6) return { stage: "Rolling", items: ["Personal Input"], source: "manual" };
+      if (manualAge < 8) return { stage: "Starting Solids", items: ["Personal Input"], source: "manual" };
+      if (manualAge < 12) return { stage: "Crawling", items: ["Personal Input"], source: "manual" };
       return { stage: "First Steps", items: ["Personal Input"], source: "manual" };
     }
 
@@ -76,9 +139,10 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
     const stages = [
       { name: "Newborn Care", keywords: ["Diaper"], priority: 1 },
       { name: "Feeding Routine", keywords: ["Bottle"], priority: 2 },
-      { name: "Starting Solids", keywords: ["Spoon", "Cereal", "Chair", "Bib"], priority: 3 },
-      { name: "Crawling Prep", keywords: ["Bear", "Play Mat"], priority: 4 },
-      { name: "First Steps", keywords: ["Shoes", "Cup"], priority: 5 },
+      { name: "Rolling", keywords: [], priority: 3 },
+      { name: "Starting Solids", keywords: ["Spoon", "Cereal", "Chair", "Bib"], priority: 4 },
+      { name: "Crawling", keywords: ["Bear", "Play Mat"], priority: 5 },
+      { name: "First Steps", keywords: ["Shoes", "Cup"], priority: 6 },
     ];
 
     let bestStage = stages[0];
@@ -97,8 +161,8 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
       });
     });
 
-    return { 
-      stage: bestStage.name, 
+    return {
+      stage: bestStage.name,
       items: triggeringItems.slice(0, 2),
       source: "cart"
     };
@@ -164,7 +228,7 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                   <p className="mt-2 text-lg text-[var(--muted-mauve)]">Premium products for every stage of your baby's journey.</p>
                 </div>
                 {totalItems > 0 && (
-                  <button 
+                  <button
                     onClick={() => setCurrentView("cart")}
                     className="flex items-center gap-3 rounded-full bg-white px-6 py-3 text-[var(--deep-plum)] shadow-sm ring-1 ring-[rgba(42,18,18,0.05)] hover:shadow-md transition-shadow"
                   >
@@ -218,11 +282,10 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                             <button
                               onClick={() => handleAddToCart(item)}
                               disabled={isAdding === item.id}
-                              className={`flex h-10 w-10 items-center justify-center rounded-full shadow-sm transition-all ${
-                                isAdding === item.id 
-                                  ? "bg-[rgba(221,239,229,0.84)] text-[var(--soft-espresso)]" 
+                              className={`flex h-10 w-10 items-center justify-center rounded-full shadow-sm transition-all ${isAdding === item.id
+                                  ? "bg-[rgba(221,239,229,0.84)] text-[var(--soft-espresso)]"
                                   : "bg-[var(--deep-plum)] text-white hover:scale-110"
-                              }`}
+                                }`}
                             >
                               {isAdding === item.id ? <CheckCircle2 className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
                             </button>
@@ -257,7 +320,7 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                   </div>
                   <h2 className="text-2xl text-[var(--deep-plum)] font-medium">Your cart is empty</h2>
                   <p className="mt-2 text-[var(--muted-mauve)]">Browse our store to find something special.</p>
-                  <button 
+                  <button
                     onClick={() => onNavigate("/")}
                     className="mt-8 rounded-full bg-[var(--deep-plum)] px-8 py-3 text-white font-medium hover:scale-105 transition-transform"
                   >
@@ -364,11 +427,11 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                         <>
                           Based on your selection, our AI predicts your baby is entering the <span className="relative inline-block">
                             <span className="relative z-10 text-[var(--deep-plum)] font-semibold">{prediction.stage}</span>
-                            <motion.span 
+                            <motion.span
                               initial={{ width: 0 }}
                               animate={{ width: "100%" }}
                               transition={{ delay: 0.8, duration: 0.6 }}
-                              className="absolute bottom-1 left-0 h-2 bg-[var(--deep-berry)]/10 -z-10" 
+                              className="absolute bottom-1 left-0 h-2 bg-[var(--deep-berry)]/10 -z-10"
                             />
                           </span> stage.
                         </>
@@ -382,10 +445,10 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
 
                   <div className="mt-16 relative">
                     <h3 className="text-sm uppercase tracking-widest text-[var(--muted-mauve)] mb-14 font-bold">The Journey Ahead</h3>
-                    
+
                     {/* Horizontal Timeline Line */}
                     <div className="absolute left-0 top-[110px] h-[3px] w-full bg-[rgba(201,47,75,0.08)] hidden lg:block" />
-                    
+
                     <div className="grid gap-12 lg:flex lg:justify-between lg:gap-0">
                       {MILESTONES.map((milestone, idx) => {
                         const isPredicted = milestone.stageKey === prediction.stage;
@@ -402,7 +465,7 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                               {isPredicted && (
                                 <>
                                   {/* PROFESSIONAL ROTATING HIGHLIGHT RING */}
-                                  <motion.div 
+                                  <motion.div
                                     animate={{ rotate: 360 }}
                                     transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                                     className="absolute -inset-3 rounded-full border-[3px] border-transparent border-t-[var(--deep-berry)] border-r-[var(--deep-berry)]/30 z-0"
@@ -410,14 +473,13 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                                   <div className="absolute -inset-10 rounded-full bg-[var(--deep-berry)]/5 blur-3xl" />
                                 </>
                               )}
-                              <div className={`relative h-28 w-28 overflow-hidden rounded-full border-4 shadow-xl transition-all duration-700 ${
-                                isPredicted 
-                                  ? "border-[var(--deep-berry)] scale-125 z-20 grayscale-0" 
+                              <div className={`relative h-28 w-28 overflow-hidden rounded-full border-4 shadow-xl transition-all duration-700 ${isPredicted
+                                  ? "border-[var(--deep-berry)] scale-125 z-20 grayscale-0"
                                   : "border-white opacity-30 grayscale z-10"
-                              }`}>
+                                }`}>
                                 <img src={milestone.image} alt={milestone.title} className="h-full w-full object-cover" />
                               </div>
-                              
+
                               {/* Dot on the Line - ULTIMATE FLUID RESONANCE EFFECT */}
                               <div className="absolute -bottom-[54px] left-1/2 -translate-x-1/2 hidden lg:block z-30">
                                 {isPredicted ? (
@@ -431,7 +493,7 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                                         className="absolute h-6 w-6 rounded-full border border-[var(--deep-berry)]/40 bg-[var(--deep-berry)]/5 blur-[1px]"
                                       />
                                     ))}
-                                    <motion.div 
+                                    <motion.div
                                       animate={{ scale: [1, 1.15, 1] }}
                                       transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                                       className="relative h-7 w-7 rounded-full border-[2.5px] border-white bg-[var(--deep-berry)] shadow-[0_0_20px_rgba(201,47,75,0.6),inset_0_0_8px_rgba(255,255,255,0.4)]"
@@ -456,7 +518,7 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                             </div>
 
                             {isPredicted && (
-                              <motion.div 
+                              <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.5 }}
@@ -475,7 +537,7 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                     <div className="mt-20 flex flex-col items-center border-t border-[rgba(201,47,75,0.08)] pt-12">
                       <AnimatePresence mode="wait">
                         {!showAgeInput ? (
-                          <motion.div 
+                          <motion.div
                             key="prompt"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -483,8 +545,8 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                             className="flex flex-col items-center text-center"
                           >
                             <p className="text-sm text-[var(--muted-mauve)] flex items-center gap-2">
-                              Is our prediction wrong? 
-                              <button 
+                              Is our prediction wrong?
+                              <button
                                 onClick={() => setShowAgeInput(true)}
                                 className="text-[var(--deep-berry)] font-bold hover:underline flex items-center gap-1"
                               >
@@ -494,38 +556,58 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                             </p>
                           </motion.div>
                         ) : (
-                          <motion.div 
+                          <motion.div
                             key="input"
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="flex flex-col items-center gap-4 bg-[rgba(248,216,213,0.05)] p-6 rounded-[2rem] border border-[rgba(201,47,75,0.1)] w-full max-w-sm shadow-sm"
+                            className="flex flex-col items-center gap-5 bg-[rgba(248,216,213,0.07)] p-6 rounded-[2rem] border border-[rgba(201,47,75,0.12)] w-full max-w-md shadow-sm"
                           >
                             <div className="flex items-center justify-between w-full">
-                              <h4 className="text-sm font-bold text-[var(--deep-plum)]">Enter Baby's Age (Months)</h4>
-                              <button onClick={() => setShowAgeInput(false)} className="text-[var(--muted-mauve)] hover:text-[var(--deep-plum)]">
+                              <h4 className="text-sm font-bold text-[var(--deep-plum)]">Slide to your baby's exact age</h4>
+                              <button onClick={() => { setShowAgeInput(false); setManualAge(null); }} className="text-[var(--muted-mauve)] hover:text-[var(--deep-plum)] transition-colors">
                                 <X className="h-4 w-4" />
                               </button>
                             </div>
-                            <div className="flex w-full gap-2">
-                              <input 
-                                type="number" 
-                                min="0" 
-                                max="24"
-                                placeholder="Age in months"
-                                className="flex-1 rounded-full bg-white px-4 py-2 text-sm border border-[rgba(42,18,18,0.1)] focus:outline-none focus:ring-2 focus:ring-[var(--deep-berry)]/20"
-                                onChange={(e) => setManualAge(Number(e.target.value) || 0)}
-                                value={manualAge || ""}
-                              />
-                              <button 
-                                onClick={() => setShowAgeInput(false)}
-                                className="rounded-full bg-[var(--deep-plum)] px-6 py-2 text-sm text-white font-bold"
-                              >
-                                Update
-                              </button>
+
+                            {/* Live age display */}
+                            <div className="flex items-center justify-center gap-3 w-full">
+                              <div className="flex-1 h-px bg-[rgba(201,47,75,0.1)]" />
+                              <AnimatePresence mode="wait">
+                                <motion.span
+                                  key={manualAge ?? 'none'}
+                                  initial={{ opacity: 0, y: -8, scale: 0.9 }}
+                                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                                  exit={{ opacity: 0, y: 8, scale: 0.9 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="rounded-full bg-[var(--deep-berry)] px-5 py-1.5 text-sm font-black text-white shadow-md min-w-[90px] text-center"
+                                >
+                                  {manualAge !== null ? `${manualAge} month${manualAge === 1 ? '' : 's'}` : 'Slide →'}
+                                </motion.span>
+                              </AnimatePresence>
+                              <div className="flex-1 h-px bg-[rgba(201,47,75,0.1)]" />
                             </div>
-                            <p className="text-[10px] text-[var(--muted-mauve)] italic text-center">
-                              Entering the exact age helps us unlock personalized bundles and loyalty offers.
+
+                            {/* Slider */}
+                            <input
+                              type="range"
+                              min={0}
+                              max={12}
+                              step={1}
+                              value={manualAge ?? 0}
+                              onChange={(e) => setManualAge(Number(e.target.value))}
+                              className="w-full accent-[var(--deep-berry)] h-2 rounded-full cursor-pointer"
+                            />
+                            <div className="flex justify-between w-full text-[10px] text-[var(--muted-mauve)]/50 font-medium px-1">
+                              <span>Newborn</span>
+                              <span>3M</span>
+                              <span>6M</span>
+                              <span>9M</span>
+                              <span>12M</span>
+                            </div>
+
+                            <p className="text-[10px] text-[var(--muted-mauve)] italic text-center leading-relaxed">
+                              The timeline updates live ↑ · Personalized bundles unlock when you set the age.
                             </p>
                           </motion.div>
                         )}
@@ -540,38 +622,66 @@ export default function HeroLanding({ onNavigate, initialView = "store" }: { onN
                           <Sparkles className="h-5 w-5 text-[var(--deep-berry)]" />
                           {prediction.source === "cart" ? "AI-Recommended Prep Kit" : "Personalized Prep Kit"}
                         </h3>
-                        <p className="mt-2 text-sm text-[var(--muted-mauve)] max-w-sm leading-relaxed">
-                          {prediction.source === "cart" 
-                            ? `Bundle these essentials specifically for the upcoming "${prediction.stage}" chapter.`
-                            : `Selected for your ${manualAge} month old's current "${prediction.stage}" needs.`}
-                        </p>
+                        <AnimatePresence mode="wait">
+                          <motion.p
+                            key={prediction.stage}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="mt-2 text-sm text-[var(--muted-mauve)] max-w-sm leading-relaxed"
+                          >
+                            {STAGE_KITS[prediction.stage]?.tagline ?? `Curated for the "${prediction.stage}" chapter.`}
+                          </motion.p>
+                        </AnimatePresence>
                       </div>
-                      <div className="text-left sm:text-right">
-                        <p className="text-2xl font-semibold text-[var(--deep-plum)]">+$144.00</p>
-                        <p className="text-xs text-[var(--deep-berry)] font-medium mt-1">Save 15% with this bundle</p>
+                      <div className="text-left sm:text-right flex-shrink-0">
+                        <AnimatePresence mode="wait">
+                          <motion.p
+                            key={prediction.stage + "-price"}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="text-2xl font-semibold text-[var(--deep-plum)]"
+                          >
+                            {STAGE_KITS[prediction.stage]?.bundlePrice ?? "+$144.00"}
+                          </motion.p>
+                        </AnimatePresence>
+                        <p className="text-xs text-[var(--deep-berry)] font-medium mt-1">
+                          {STAGE_KITS[prediction.stage]?.saving ?? "Save 15% with this bundle"}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="grid gap-4 sm:grid-cols-2 mb-8">
-                      <div className="flex items-center gap-4 p-4 rounded-[1.5rem] bg-white border border-[rgba(42,18,18,0.03)] shadow-sm hover:shadow-md transition-all">
-                        <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-[1rem] bg-[rgba(255,251,247,0.94)]">
-                          <PremiumBabyIcon name="chair" className="h-full w-full object-cover" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-[var(--deep-plum)]">High Chair</p>
-                          <p className="text-xs text-[var(--muted-mauve)] mt-0.5">Ergonomic design</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4 p-4 rounded-[1.5rem] bg-white border border-[rgba(42,18,18,0.03)] shadow-sm hover:shadow-md transition-all">
-                        <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-[1rem] bg-[rgba(255,251,247,0.94)]">
-                          <PremiumBabyIcon name="bib" className="h-full w-full object-cover" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-[var(--deep-plum)]">Silicone Bibs</p>
-                          <p className="text-xs text-[var(--muted-mauve)] mt-0.5">Set of 2, mess-free</p>
-                        </div>
-                      </div>
-                    </div>
+                    {/* Dynamic Product Cards */}
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={prediction.stage}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -12 }}
+                        transition={{ duration: 0.35, ease: "easeOut" }}
+                        className="grid gap-4 sm:grid-cols-2 mb-8"
+                      >
+                        {(STAGE_KITS[prediction.stage]?.products ?? STAGE_KITS["Starting Solids"].products).map((product, i) => (
+                          <motion.div
+                            key={product.name}
+                            initial={{ opacity: 0, x: i === 0 ? -10 : 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1, duration: 0.3 }}
+                            className="flex items-center gap-4 p-4 rounded-[1.5rem] bg-white border border-[rgba(42,18,18,0.03)] shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+                          >
+                            <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-[1rem] bg-[rgba(255,251,247,0.94)]">
+                              <PremiumBabyIcon name={product.icon} className="h-full w-full object-cover" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-[var(--deep-plum)]">{product.name}</p>
+                              <p className="text-xs text-[var(--muted-mauve)] mt-0.5">{product.desc}</p>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    </AnimatePresence>
 
                     <div className="flex flex-col sm:flex-row gap-3">
                       <button
