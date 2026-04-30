@@ -1,77 +1,79 @@
-# ✨ MumzMind: AI-Driven Parenting Intelligence
+# MumzMind — Baby Stage Intelligence Engine
 
-> **Elevating the Retail Experience through Predictive Stage Guidance and Premium Motion Design.**
-
-MumzMind is a high-fidelity, AI-powered parenting intelligence prototype designed for modern platforms. It transforms the traditional e-commerce journey into a proactive, guided experience by predicting a baby's developmental stage in real-time and providing personalized preparation for the "Next Chapter."
+> **Proactive Parenting Intelligence: Predicting the "Next Chapter" through Predictive Cart Logic and Premium Motion Design.**
 
 ---
 
-## 🚀 Vision & Problem Statement
+## 🚀 The Problem
+Modern parents are often overwhelmed by the rapid transitions between developmental stages (newborn care, starting solids, first steps). Traditional e-commerce platforms are **reactive**, showing products based on what a parent is buying *now*, rather than helping them prepare for what is coming *next*. This leads to "last-minute" shopping stress and missed opportunities for early developmental support.
 
-**The Problem:** Parents often struggle with the transition between developmental stages (newborn care, starting solids, first steps). Retailers typically react to what a parent buys *now*, rather than helping them prepare for what is coming *next*.
+## 💡 Our Solution
+**MumzMind** is a high-fidelity intelligence engine that transforms the retail journey into a proactive, guided experience. By analyzing shopping patterns and manual inputs, MumzMind predicts a baby's developmental stage in real-time. It visualizes the "Journey Ahead" with a premium interactive timeline and offers **Dynamic Prep Kits**—curated bundles that solve for the next milestone before it arrives.
 
-**The Solution:** MumzMind uses **Predictive Cart Logic** to detect the baby's current developmental stage. It then visualizes the "Journey Ahead" with a premium, interactive timeline and offers **Dynamic Prep Kits**—curated bundles that solve for the next milestone before it arrives.
+---
+
+## 🏆 Track Selection
+**Track Selected:** Track A
+
+## 🔗 Live Demo
+[View Live Demo](https://mumzmind.vercel.app)
+
+---
+
+## 📸 Screenshots & Previews
+
+| The Journey Ahead (Timeline) | Predictive Intelligence |
+| :---: | :---: |
+| ![Timeline View](public/mumzmind/timeline/six-months.jpg) | ![Predictive Analysis](public/mumzmind/timeline/newborn.jpg) |
 
 ---
 
 ## 🌟 Key Features
 
-### 🧠 AI Predictive Engine
-- **Real-Time Analysis**: Monitors shopping cart items to determine the baby's developmental stage (e.g., Diapers → Newborn, High Chair → Starting Solids).
-- **Explanation Signals**: Tells the parent *why* a certain stage was predicted ("Based on your interest in Silicone Bibs...").
-- **Dynamic Pricing**: Instant bundle savings calculated live based on the predicted kit.
+- **Rule-Based Intelligence Engine**: Real-time analysis of purchase history and cart items to determine developmental milestones.
+- **Interactive First-Year Timeline**: A fluid, motion-rich visualization of growth stages from 0 to 12 months.
+- **Live Age Correction Loop**: A seamless UI slider that allows parents to override predictions for 100% accurate guidance.
+- **Dynamic Prep Kits**: Context-aware product bundles that unlock as the baby nears a new stage.
+- **Premium Aesthetics**: Built with high-end typography, glassmorphism, and photorealistic assets for a luxury retail feel.
 
-### ⏳ The Journey Ahead (Interactive Timeline)
-- **Fluid Resonance Animations**: Premium, physics-based concentric ripples on active nodes using `motion/react`.
-- **Photorealistic Assets**: High-end professional photography for every milestone (Newborn, Rolling, Sitting Up, etc.).
-- **Visual Hierarchy**: Grayscale desaturation for non-active milestones to emphasize the current focus.
+## 🛠️ Tech Stack
 
-### 🎚️ Live Age Correction Loop
-- **Instant Personalization**: A seamless, live-updating slider allowing parents to set the exact age in months.
-- **Real-Time UI Sync**: The timeline, prep kits, and recommendations update instantly as the slider moves—no "Update" button required.
-- **Predictive Overwrite**: Manual input intelligently overrides cart-based guesses to provide 100% accurate guidance.
-
-### 🛍️ Dynamic Prep Kits
-- **Context-Aware Bundles**: Each developmental stage unlocks a unique pair of products (e.g., Anti-Colic Bottles for 2M, First Walker Shoes for 12M).
-- **One-Click Checkout**: Streamlined "Add Kit & Complete Order" flow.
-- **Premium Product UI**: Hover-sensitive cards with realistic textures and detailed descriptions.
+- **Frontend**: Next.js 15+ (App Router), TypeScript
+- **Styling**: Tailwind CSS & Vanilla CSS (Custom tokens)
+- **Animations**: Framer Motion (`motion/react`), GSAP
+- **Smoothing**: Lenis (Smooth Scroll)
+- **Icons**: Lucide React & Custom Premium Icons
 
 ---
 
-## 🛠️ Technology Stack
+## 🧠 How the Rule-Based Intelligence Works
+The "Intelligence" in MumzMind is powered by a deterministic **Stage Engine** (`lib/stage-engine.ts`) designed for retail environments.
 
-| Layer | Technology |
-| :--- | :--- |
-| **Framework** | [Next.js 15+](https://nextjs.org/) (App Router) |
-| **Language** | [TypeScript](https://www.typescriptlang.org/) |
-| **Styling** | [Tailwind CSS](https://tailwindcss.com/) & Vanilla CSS |
-| **Animations** | [Framer Motion](https://www.framer.com/motion/) (`motion/react`) |
-| **Iconography** | [Lucide React](https://lucide.dev/) |
-| **Smooth Scroll**| [Lenis](https://lenis.darkroom.engineering/) |
-
----
-
-## 📂 Project Structure
-
-```text
-mumzmind/
-├── app/                  # Next.js Routes
-│   ├── cart/             # Predictive Cart Experience
-│   └── timeline/         # The Journey Ahead
-├── src/
-│   ├── features/
-│   │   └── mumzmind/     # Core Business Logic
-│   │       ├── components/ # Premium UI Components
-│   │       ├── CartContext.tsx # State Management
-│   │       └── routes.ts   # Navigation Mapping
-├── public/               # Realistic Asset Library
-│   ├── images/           # Product Photography
-│   └── mumzmind/         # Timeline Assets
-```
+1. **Category Mapping**: Every product in the catalog is tagged with developmental metadata (e.g., "Size 1 Diapers" → "Newborn Care").
+2. **State Sequence**: The engine maintains a sequential map of baby growth (Newborn → Solids → Crawling → First Steps).
+3. **Inference Logic**: 
+   - If a user adds "Baby Cereal" to their cart, the engine infers they are approaching the **Starting Solids** stage.
+   - It calculates a **Confidence Score** based on timing, purchase frequency, and data freshness.
+4. **Predictive Windows**: Each stage has a defined "Next Stage" and a timing window (e.g., "Starting Solids" is predicted 2-4 weeks before the transition).
 
 ---
 
-## ⚙️ Setup & Installation
+## 🚫 No-AI-API Note
+> [!IMPORTANT]
+> **This project does NOT use any external LLM APIs (such as Gemini, OpenAI, or Claude).**
+> All "intelligence" and predictions are handled locally via the deterministic rule-based engine. This was a conscious design choice to ensure **zero-latency responses**, 100% predictable behavior for the retail prototype, and a focus on high-fidelity UI/UX without the cost or complexity of real-time LLM calls.
+
+---
+
+## 🔮 Future Scope
+- **Real LLM Integration**: Moving from rule-based logic to a true LLM for nuanced, conversational stage prediction.
+- **Multi-Child Profiles**: Support for parents managing different timelines for multiple children.
+- **Arabic Localization**: Full RTL support tailored for the Middle Eastern market.
+- **Direct Checkout Integration**: Seamless API calls to retail backends for one-click prep kit fulfillment.
+
+---
+
+## 🏗️ Setup Instructions
 
 ### Prerequisites
 - Node.js (Latest LTS)
@@ -81,7 +83,7 @@ mumzmind/
 
 1. **Clone the repository:**
    ```bash
-   git clone [repository-url]
+   git clone https://github.com/danyl-dnl/Mumzmind.git
    cd mumzmind
    ```
 
@@ -99,19 +101,4 @@ mumzmind/
    Navigate to `http://localhost:3000` in your browser.
 
 ---
-
-## 🔮 Future Roadmap
-
-- [ ] **Real LLM Integration**: Transition from rule-based logic to a true LLM (Gemini/OpenAI) for nuanced stage prediction.
-- [ ] **Persistence**: Integrate `localStorage` or a database to maintain cart and age state across sessions.
-- [ ] **Arabic Localization**: Full RTL support for the Middle Eastern market.
-- [ ] **CRM Dashboard**: Real-time analytics for retail teams to monitor stage transitions across the user base.
-
----
-
-## 📝 License
-
-This project is a high-fidelity prototype. All product images and brand names are used for demonstration purposes only.
-
----
-*Created with ❤️ by the MumzMind Engineering Team.*
+*Created with ❤️ for the MumzMind Experience.*
