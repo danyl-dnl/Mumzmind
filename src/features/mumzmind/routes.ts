@@ -11,7 +11,7 @@ export type MumzMindScreen = keyof typeof mumzMindRouteMap;
 export const mumzMindNavLinks = [
   { href: "/", label: "Home" },
   { href: "/parent", label: "Parent Feed" },
-  { href: "/timeline", label: "Timeline" },
-  { href: "/stage", label: "Stage Detail" },
-  { href: "/crm", label: "CRM Dashboard" },
+  { href: "/timeline", label: "Baby Timeline" },
+  { href: "/stage", label: "Next Chapter" },
+  { href: "/crm", label: "CRM View" },
 ] as const;

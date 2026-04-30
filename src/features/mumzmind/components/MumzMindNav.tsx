@@ -28,8 +28,8 @@ export default function MumzMindNav() {
 
             <div className="flex items-center gap-2 lg:hidden">
               <div className="rounded-full border border-[var(--blush-pink)]/60 bg-white/80 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--deep-berry)]">
-            Next Chapter
-          </div>
+                Next Chapter
+              </div>
               <StaggeredMenu
                 items={mobileMenuItems}
                 logo="MumzMind"

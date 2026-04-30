@@ -14,7 +14,7 @@ import familiesData from "../data/families.json";
 import { type GsapScrollTools, useGsapScroll } from "../hooks/useGsapScroll";
 import { useLenis } from "../hooks/useLenis";
 import { predictBabyStage } from "../lib/stage-engine";
-import type { FamilyProfile } from "../types";
+import type { FamilyProfile, StagePredictionResult } from "../types";
 import { PremiumBabyIcon, type PremiumBabyIconName } from "./PremiumBabyIcons";
 
 const HOW_IT_WORKS = [
@@ -43,13 +43,6 @@ const JOURNEY_PREVIEW = [
   { label: "First Shoes", iconName: "shoe" as PremiumBabyIconName },
 ];
 
-const CRM_PREVIEW = [
-  { label: "Starting solids soon", value: "12 families" },
-  { label: "At-risk families", value: "4 families" },
-  { label: "Journeys prepared", value: "18 ready" },
-  { label: "Next best action", value: "Gentle reminder" },
-];
-
 const DEMO_FEEDBACK = [
   "The next step felt clearer without feeling pushy.",
   "I liked seeing why this stage may be coming.",
@@ -68,7 +61,26 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
     families.find((entry) => entry.parentName === "Sara" && entry.babyName === "Omar") ??
     families[0];
   const prediction = predictBabyStage(family);
+  const familyPredictions: StagePredictionResult[] = families.map((entry) => predictBabyStage(entry));
   const essentialsPreview = prediction.recommendedCategories.slice(0, 3);
+  const crmPreview = [
+    {
+      label: "Starting solids soon",
+      value: `${familyPredictions.filter((entry) => entry.nextStage === "Starting Solids").length} families`,
+    },
+    {
+      label: "At-risk families",
+      value: `${familyPredictions.filter((entry) => entry.riskLevel !== "Low").length} families`,
+    },
+    {
+      label: "Journeys prepared",
+      value: `${families.length} ready`,
+    },
+    {
+      label: "Next best action",
+      value: prediction.nextBestAction.replace(/^Send /, ""),
+    },
+  ];
 
   const hoverScale = reducedMotion ? undefined : { scale: 1.03 };
   const tapScale = reducedMotion ? undefined : { scale: 0.97 };
@@ -389,7 +401,7 @@ export default function HeroLanding({ onNavigate }: { onNavigate: (screen: strin
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              {CRM_PREVIEW.map((item) => (
+              {crmPreview.map((item) => (
                 <motion.article
                   key={item.label}
                   className="mumz-card-soft rounded-[1.7rem] p-5"

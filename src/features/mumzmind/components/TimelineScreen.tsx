@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "motion/react";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useState } from "react";
 
 import familiesData from "../data/families.json";
 import stagesData from "../data/stages.json";
@@ -15,6 +17,8 @@ type Milestone = {
   title: string;
   description: string;
   placeholderLabel: string;
+  imageSrc: string;
+  imageAlt: string;
   iconName: PremiumBabyIconName;
 };
 
@@ -24,6 +28,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "Newborn",
     description: "Getting to know the world with comfort and care.",
     placeholderLabel: "Newborn image",
+    imageSrc: "/mumzmind/timeline/newborn.jpg",
+    imageAlt: "Soft newborn care scene",
     iconName: "newborn",
   },
   {
@@ -31,6 +37,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "Early Smiles",
     description: "Smiling more and discovering familiar faces.",
     placeholderLabel: "2-month image",
+    imageSrc: "/mumzmind/timeline/two-months.jpg",
+    imageAlt: "Two-month baby milestone scene",
     iconName: "newborn",
   },
   {
@@ -38,6 +46,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "Rolling & Reaching",
     description: "More movement and reaching for favorite things.",
     placeholderLabel: "4-month image",
+    imageSrc: "/mumzmind/timeline/four-months.jpg",
+    imageAlt: "Four-month rolling and reaching milestone scene",
     iconName: "playmat",
   },
   {
@@ -45,6 +55,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "Sitting Up",
     description: "Sitting with support and showing more personality.",
     placeholderLabel: "6-month image",
+    imageSrc: "/mumzmind/timeline/six-months.jpg",
+    imageAlt: "Six-month sitting up and starting solids milestone scene",
     iconName: "chair",
   },
   {
@@ -52,6 +64,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "Crawling & Exploring",
     description: "Getting curious and exploring the world around them.",
     placeholderLabel: "8-month image",
+    imageSrc: "/mumzmind/timeline/eight-months.jpg",
+    imageAlt: "Eight-month crawling and exploring milestone scene",
     iconName: "teddy",
   },
   {
@@ -59,6 +73,8 @@ const FIRST_YEAR_MILESTONES: Milestone[] = [
     title: "First Steps",
     description: "Walking with support and celebrating big milestones.",
     placeholderLabel: "12-month image",
+    imageSrc: "/mumzmind/timeline/twelve-months.jpg",
+    imageAlt: "Twelve-month first steps milestone scene",
     iconName: "shoe",
   },
 ];
@@ -77,6 +93,7 @@ function getNearestMilestoneIndex(ageMonths: number): number {
 
 export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: string) => void }) {
   const motionConfig = usePageMotion();
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
   const families = familiesData as FamilyProfile[];
   const stageCatalog = stagesData as BabyStage[];
   const family =
@@ -129,6 +146,7 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
                 {FIRST_YEAR_MILESTONES.map((milestone, index) => {
                   const isActive = index === activeMilestoneIndex;
                   const isPast = milestone.month < activeMilestone.month;
+                  const showFallback = imageErrors[milestone.month] ?? false;
 
                   return (
                     <motion.article
@@ -137,18 +155,34 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
                       {...motionConfig.getReveal({ delay: 0.16 + index * 0.06, direction: "up", distance: 18, duration: 0.45 })}
                     >
                       <div
-                        className={`flex h-32 w-32 items-center justify-center rounded-[2rem] border px-4 py-4 shadow-[0_14px_32px_rgba(42,18,18,0.05)] ${
+                        className={`relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2rem] border px-4 py-4 shadow-[0_14px_32px_rgba(42,18,18,0.05)] ${
                           isActive
                             ? "border-[rgba(201,47,75,0.16)] bg-[linear-gradient(180deg,rgba(248,216,213,0.52),rgba(255,251,247,0.98))]"
                             : "border-[rgba(42,18,18,0.07)] bg-[linear-gradient(180deg,rgba(255,251,247,0.96),rgba(243,230,220,0.72))]"
                         }`}
                       >
-                        <div className="flex flex-col items-center gap-3">
-                          <div className="flex h-14 w-14 items-center justify-center rounded-[1.1rem] bg-white/84 shadow-[0_10px_20px_rgba(42,18,18,0.04)]">
-                            <PremiumBabyIcon name={milestone.iconName} className="h-8 w-8" />
+                        {showFallback ? (
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-[1.1rem] bg-white/84 shadow-[0_10px_20px_rgba(42,18,18,0.04)]">
+                              <PremiumBabyIcon name={milestone.iconName} className="h-8 w-8" />
+                            </div>
+                            <span className="text-xs text-[var(--muted-mauve)]">{milestone.placeholderLabel}</span>
                           </div>
-                          <span className="text-xs text-[var(--muted-mauve)]">{milestone.placeholderLabel}</span>
-                        </div>
+                        ) : (
+                          <Image
+                            src={milestone.imageSrc}
+                            alt={milestone.imageAlt}
+                            fill
+                            sizes="128px"
+                            className="object-cover"
+                            onError={() =>
+                              setImageErrors((current) => ({
+                                ...current,
+                                [milestone.month]: true,
+                              }))
+                            }
+                          />
+                        )}
                       </div>
 
                       <div className="mt-5 min-h-[4.5rem] px-2">
@@ -166,7 +200,7 @@ export default function TimelineScreen({ onNavigate }: { onNavigate: (screen: st
                         <div
                           className={`relative z-10 flex h-12 w-12 items-center justify-center rounded-full border text-sm shadow-[0_10px_20px_rgba(42,18,18,0.04)] ${
                             isActive
-                              ? "h-14 w-14 border-[rgba(143,16,37,0.18)] bg-[linear-gradient(180deg,rgba(201,47,75,0.98),rgba(143,16,37,0.96))] text-white ring-4 ring-[rgba(248,216,213,0.62)]"
+                              ? "h-14 w-14 border-[rgba(143,16,37,0.18)] bg-[linear-gradient(180deg,rgba(201,47,75,0.98),rgba(143,16,37,0.96))] text-white ring-[10px] ring-[rgba(248,216,213,0.5)] shadow-[0_0_0_1px_rgba(255,255,255,0.72),0_0_0_16px_rgba(248,216,213,0.24),0_18px_34px_rgba(143,16,37,0.16),0_0_34px_rgba(201,47,75,0.14)]"
                               : isPast
                                 ? "border-[rgba(42,18,18,0.09)] bg-white text-[var(--deep-plum)]"
                                 : "border-[rgba(42,18,18,0.08)] bg-[rgba(255,251,247,0.98)] text-[var(--deep-plum)]"
